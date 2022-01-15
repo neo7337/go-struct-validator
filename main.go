@@ -8,7 +8,40 @@ import (
 	"strings"
 )
 
-func Validate(v interface{}) error {
+type ValidatorFunc func(v interface{}, param string) error
+
+type StructValidator struct {
+	validationFuncs map[string]ValidatorFunc
+	tagName         string
+}
+
+func NewStructValidator() *StructValidator {
+	return &StructValidator{
+		validationFuncs: map[string]ValidatorFunc{
+			// Base Constraints
+			// boolean value
+			// mandatory field
+			"required": required,
+			// boolean value
+			// mandatory field
+			"nillable": nillable,
+			"default":  def,
+			// Numeric Constraints
+			"min":          min,
+			"max":          max,
+			"exclusiveMin": exclusiveMin,
+			"exclusiveMax": exclusiveMax,
+			"multipleOf":   multipleOf,
+			// String Constraints
+			"min-length": minLength,
+			"max-length": maxLength,
+			"pattern":    pattern,
+		},
+		tagName: "constraints",
+	}
+}
+
+func (sv *StructValidator) Validate(v interface{}) error {
 
 	value := reflect.ValueOf(v)
 	typ := value.Type()
