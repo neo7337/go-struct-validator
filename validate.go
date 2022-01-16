@@ -1,4 +1,4 @@
-package main
+package validator
 
 import (
 	"errors"
@@ -8,16 +8,16 @@ import (
 	"strings"
 )
 
-type ValidatorFunc func(v interface{}, param string) error
+type StructValidatorFunc func(v interface{}, param string) error
 
 type StructValidator struct {
-	validationFuncs map[string]ValidatorFunc
+	validationFuncs map[string]StructValidatorFunc
 	tagName         string
 }
 
 func NewStructValidator() *StructValidator {
 	return &StructValidator{
-		validationFuncs: map[string]ValidatorFunc{
+		validationFuncs: map[string]StructValidatorFunc{
 			// Base Constraints
 			// boolean value
 			// mandatory field
