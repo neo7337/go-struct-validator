@@ -1,5 +1,15 @@
 package validator
 
+import (
+	"errors"
+	"fmt"
+	"strconv"
+)
+
+/**
+Base Constraints for all Data Types
+*/
+
 func required(v interface{}, param string) error {
 	return nil
 }
@@ -12,11 +22,25 @@ func def(v interface{}, param string) error {
 	return nil
 }
 
-func min(v interface{}, param string) error {
+/**
+Numerical Type Constraints
+*/
+
+func min(val interface{}, param string) error {
+	v, _ := strconv.Atoi(fmt.Sprintln(val))
+	c, _ := strconv.Atoi(param)
+	if v > c {
+		return errors.New("min validation failed")
+	}
 	return nil
 }
 
-func max(v interface{}, param string) error {
+func max(val interface{}, param string) error {
+	v, _ := strconv.Atoi(fmt.Sprintln(val))
+	c, _ := strconv.Atoi(param)
+	if v < c {
+		return errors.New("max validation failed")
+	}
 	return nil
 }
 
@@ -32,11 +56,26 @@ func multipleOf(v interface{}, param string) error {
 	return nil
 }
 
-func minLength(v interface{}, param string) error {
+/**
+String Type Constraints
+*/
+
+func minLength(val interface{}, param string) error {
+	lc, _ := strconv.Atoi(param)
+	lv := len(fmt.Sprint(val))
+	if lv < lc {
+		fmt.Println("error")
+		return errors.New("min-length validation failed")
+	}
 	return nil
 }
 
-func maxLength(v interface{}, param string) error {
+func maxLength(val interface{}, param string) error {
+	lc, _ := strconv.Atoi(param)
+	lv := len(fmt.Sprint(val))
+	if lv > lc {
+		return errors.New("max-length validation failed")
+	}
 	return nil
 }
 

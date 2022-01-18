@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"strconv"
 	"strings"
 )
+
+var mandatory = [...]string{"required", "nillable"}
 
 type StructValidatorFunc func(v interface{}, param string) error
 
@@ -35,33 +36,28 @@ func NewStructValidator() *StructValidator {
 			// String Constraints
 			"min-length": minLength,
 			"max-length": maxLength,
-			"pattern":    pattern,
+			// regex pattern support
+			"pattern": pattern,
 		},
 		tagName: "constraints",
 	}
 }
 
 func (sv *StructValidator) Validate(v interface{}) error {
-
 	value := reflect.ValueOf(v)
 	typ := value.Type()
-
 	for i := 0; i < typ.NumField(); i++ {
 		f := typ.Field(i)
-
 		tag := f.Tag.Get("constraints")
 		constraints := parseTag(tag)
 		fieldValue := value.Field(i)
-		// fmt.Println("fieldName", f.Name)
-		// fmt.Println("fieldValue", value.Field(i))
-		// fmt.Println("fieldType", f.Type.Kind())
-		// fmt.Println("tagNames", constraints)
-
-		if err := executeValidators(fieldValue, f.Type, constraints); err != nil {
+		if err := sv.checkIfMandatoryTagPresent(constraints); err != nil {
+			return err
+		}
+		if err := sv.executeValidators(fieldValue, f.Type, constraints); err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -69,47 +65,29 @@ func parseTag(tag string) map[string]string {
 	m := make(map[string]string)
 	split := strings.Split(tag, ",")
 	for _, str := range split {
-		constraintName := strings.Split(str, ":")[0]
-		constraintValue := strings.Split(str, ":")[1]
+		constraintName := strings.Split(str, "=")[0]
+		constraintValue := strings.Split(str, "=")[1]
 		m[constraintName] = constraintValue
 	}
 	return m
 }
 
-// type validatorFunc func(value reflect.Value, constraint map[string]string)
-
-func executeValidators(value reflect.Value, typ reflect.Type, constraint map[string]string) error {
-	switch typ.Kind() {
-	case reflect.Bool:
-		return boolValidator(value, constraint)
-	case reflect.String:
-		return stringValidator(value, constraint)
-	default:
-		return invalidValidator(value, constraint)
-	}
-}
-
-func stringValidator(value reflect.Value, constraint map[string]string) error {
-
-	// constraints to be predefined and mapped to a particular validation
-	fmt.Println("executing validator", value)
-	for i, val := range constraint {
-		fmt.Println(i, val)
-		le, _ := strconv.Atoi(val)
-		lenF := len(value.String())
-
-		if lenF < le {
-			return errors.New("validation failed")
+func (sv *StructValidator) executeValidators(value reflect.Value, typ reflect.Type, constraint map[string]string) error {
+	for i, v := range constraint {
+		if err := sv.validationFuncs[i](value, v); err != nil {
+			return err
+		} else {
+			continue
 		}
-
 	}
 	return nil
 }
 
-func boolValidator(value reflect.Value, constraint map[string]string) error {
-	return nil
-}
-
-func invalidValidator(value reflect.Value, constraint map[string]string) error {
+func (sv *StructValidator) checkIfMandatoryTagPresent(constraint map[string]string) error {
+	for _, v := range mandatory {
+		if _, ok := constraint[v]; !ok {
+			return errors.New(fmt.Sprintf("mandatory field %s not present", v))
+		}
+	}
 	return nil
 }
