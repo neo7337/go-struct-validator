@@ -11,7 +11,7 @@ type Message struct {
 }
 
 // negative test case
-func TestNewStructValidator(t *testing.T) {
+func TestRequiredConstraintFail(t *testing.T) {
 	msg := Message{
 		Name: "Test",
 		Age:  11,
@@ -26,10 +26,24 @@ func TestNewStructValidator(t *testing.T) {
 }
 
 // Positive Test Case
-func TestNewStructValidator2(t *testing.T) {
+func TestSuccessValidation(t *testing.T) {
 	msg := Message{
 		Name: "Testy",
 		Age:  11,
+	}
+	sv := validator.NewStructValidator()
+	if err := sv.Validate(msg); err != nil {
+		t.Errorf("Error in validation: %d", err)
+	}
+}
+
+type BoolMessage struct {
+	Present bool `json:"present" constraints:"required=true,nillable=true"`
+}
+
+func TestRequiredConstraintSuccess(t *testing.T) {
+	msg := BoolMessage{
+		Present: true,
 	}
 	sv := validator.NewStructValidator()
 	if err := sv.Validate(msg); err != nil {

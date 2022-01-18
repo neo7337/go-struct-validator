@@ -10,7 +10,13 @@ import (
 Base Constraints for all Data Types
 */
 
-func required(v interface{}, param string) error {
+func required(val interface{}, param string) error {
+	v, _ := val.(string)
+	fmt.Println(v)
+	// c, _ := strconv.ParseBool(param)
+	if val == nil {
+		return errors.New("required validation failed")
+	}
 	return nil
 }
 
