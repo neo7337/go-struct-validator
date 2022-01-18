@@ -1,9 +1,13 @@
 package validator
 
 import (
+	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 )
+
+var mandatory = [...]string{"required", "nillable"}
 
 type StructValidatorFunc func(v interface{}, param string) error
 
@@ -32,7 +36,8 @@ func NewStructValidator() *StructValidator {
 			// String Constraints
 			"min-length": minLength,
 			"max-length": maxLength,
-			"pattern":    pattern,
+			// regex pattern support
+			"pattern": pattern,
 		},
 		tagName: "constraints",
 	}
@@ -46,6 +51,9 @@ func (sv *StructValidator) Validate(v interface{}) error {
 		tag := f.Tag.Get("constraints")
 		constraints := parseTag(tag)
 		fieldValue := value.Field(i)
+		if err := sv.checkIfMandatoryTagPresent(constraints); err != nil {
+			return err
+		}
 		if err := sv.executeValidators(fieldValue, f.Type, constraints); err != nil {
 			return err
 		}
@@ -70,6 +78,15 @@ func (sv *StructValidator) executeValidators(value reflect.Value, typ reflect.Ty
 			return err
 		} else {
 			continue
+		}
+	}
+	return nil
+}
+
+func (sv *StructValidator) checkIfMandatoryTagPresent(constraint map[string]string) error {
+	for _, v := range mandatory {
+		if _, ok := constraint[v]; !ok {
+			return errors.New(fmt.Sprintf("mandatory field %s not present", v))
 		}
 	}
 	return nil
