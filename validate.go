@@ -1,7 +1,6 @@
 package validator
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 )
@@ -40,28 +39,17 @@ func NewStructValidator() *StructValidator {
 }
 
 func (sv *StructValidator) Validate(v interface{}) error {
-
 	value := reflect.ValueOf(v)
 	typ := value.Type()
-	fmt.Println(value)
 	for i := 0; i < typ.NumField(); i++ {
 		f := typ.Field(i)
-		fmt.Println(f)
-		fmt.Println("in loop")
 		tag := f.Tag.Get("constraints")
-		fmt.Println(tag)
 		constraints := parseTag(tag)
 		fieldValue := value.Field(i)
-		fmt.Println("fieldName", f.Name)
-		fmt.Println("fieldValue", value.Field(i))
-		fmt.Println("fieldType", f.Type.Kind())
-		fmt.Println("tagNames", constraints)
-
 		if err := sv.executeValidators(fieldValue, f.Type, constraints); err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
