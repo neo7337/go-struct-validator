@@ -10,7 +10,23 @@ type Message struct {
 	Age  int    `json:"age" constraints:"min=10"`
 }
 
+// negative test case
 func TestNewStructValidator(t *testing.T) {
+	msg := Message{
+		Name: "Test",
+		Age:  11,
+	}
+	sv := validator.NewStructValidator()
+	err := sv.Validate(msg)
+	got := err.Error()
+	want := "mandatory field required not present"
+	if got != want {
+		t.Errorf("Expected: %s, got: %s", got, want)
+	}
+}
+
+// Positive Test Case
+func TestNewStructValidator2(t *testing.T) {
 	msg := Message{
 		Name: "Testy",
 		Age:  11,
