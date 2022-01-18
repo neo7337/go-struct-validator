@@ -10,10 +10,40 @@ type Message struct {
 	Age  int    `json:"age" constraints:"min=10"`
 }
 
-func TestNewStructValidator(t *testing.T) {
+// negative test case
+func TestRequiredConstraintFail(t *testing.T) {
+	msg := Message{
+		Name: "Test",
+		Age:  11,
+	}
+	sv := validator.NewStructValidator()
+	err := sv.Validate(msg)
+	got := err.Error()
+	want := "mandatory field required not present"
+	if got != want {
+		t.Errorf("Expected: %s, got: %s", got, want)
+	}
+}
+
+// Positive Test Case
+func TestSuccessValidation(t *testing.T) {
 	msg := Message{
 		Name: "Testy",
 		Age:  11,
+	}
+	sv := validator.NewStructValidator()
+	if err := sv.Validate(msg); err != nil {
+		t.Errorf("Error in validation: %d", err)
+	}
+}
+
+type BoolMessage struct {
+	Present bool `json:"present" constraints:"required=true,nillable=true"`
+}
+
+func TestRequiredConstraintSuccess(t *testing.T) {
+	msg := BoolMessage{
+		Present: true,
 	}
 	sv := validator.NewStructValidator()
 	if err := sv.Validate(msg); err != nil {
