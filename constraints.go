@@ -1,7 +1,6 @@
 package validator
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 )
@@ -15,7 +14,7 @@ func required(val interface{}, param string) error {
 	fmt.Println(v)
 	// c, _ := strconv.ParseBool(param)
 	if val == nil {
-		return errors.New("required validation failed")
+		return ErrRequired
 	}
 	return nil
 }
@@ -36,7 +35,7 @@ func min(val interface{}, param string) error {
 	v, _ := strconv.Atoi(fmt.Sprintln(val))
 	c, _ := strconv.Atoi(param)
 	if v > c {
-		return errors.New("min validation failed")
+		return ErrMin
 	}
 	return nil
 }
@@ -45,7 +44,7 @@ func max(val interface{}, param string) error {
 	v, _ := strconv.Atoi(fmt.Sprintln(val))
 	c, _ := strconv.Atoi(param)
 	if v < c {
-		return errors.New("max validation failed")
+		return ErrMax
 	}
 	return nil
 }
@@ -71,7 +70,7 @@ func minLength(val interface{}, param string) error {
 	lv := len(fmt.Sprint(val))
 	if lv < lc {
 		fmt.Println("error")
-		return errors.New("min-length validation failed")
+		return ErrMinLength
 	}
 	return nil
 }
@@ -80,7 +79,7 @@ func maxLength(val interface{}, param string) error {
 	lc, _ := strconv.Atoi(param)
 	lv := len(fmt.Sprint(val))
 	if lv > lc {
-		return errors.New("max-length validation failed")
+		return ErrMaxLength
 	}
 	return nil
 }
