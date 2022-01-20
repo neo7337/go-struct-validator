@@ -50,3 +50,17 @@ func TestRequiredConstraintSuccess(t *testing.T) {
 		t.Errorf("Error in validation: %d", err)
 	}
 }
+
+type DefMessage struct {
+	Count int `json:"count" constraints:"required=true,nillable=true,default=0"`
+}
+
+func TestDefConstraint(t *testing.T) {
+	msg := DefMessage{
+		Count: 0,
+	}
+	sv := validator.NewStructValidator()
+	if err := sv.Validate(msg); err != nil {
+		t.Errorf("Error in validation: %d", err)
+	}
+}
