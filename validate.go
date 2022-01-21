@@ -9,7 +9,7 @@ import (
 
 var mandatory = [...]string{"required", "nillable"}
 
-type StructValidatorFunc func(v interface{}, param string) error
+type StructValidatorFunc func(v interface{}, typ reflect.Type, param string) error
 
 type StructValidator struct {
 	validationFuncs map[string]StructValidatorFunc
@@ -44,6 +44,9 @@ func NewStructValidator() *StructValidator {
 }
 
 func (sv *StructValidator) Validate(v interface{}) error {
+
+	// add a logic to check for the empty struct input in order to skip the validation of the struct
+
 	value := reflect.ValueOf(v)
 	typ := value.Type()
 	for i := 0; i < typ.NumField(); i++ {
@@ -74,7 +77,7 @@ func parseTag(tag string) map[string]string {
 
 func (sv *StructValidator) executeValidators(value reflect.Value, typ reflect.Type, constraint map[string]string) error {
 	for i, v := range constraint {
-		if err := sv.validationFuncs[i](value, v); err != nil {
+		if err := sv.validationFuncs[i](value, typ, v); err != nil {
 			return err
 		} else {
 			continue
