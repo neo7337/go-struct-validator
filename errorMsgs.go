@@ -32,4 +32,6 @@ var (
 	ErrMaxLength = ErrMsg{errors.New("max-length validation failed")}
 
 	ErrPattern = ErrMsg{errors.New("pattern validation failed")}
+
+	ErrBadConstraint = ErrMsg{errors.New("invalid constraint value")}
 )
