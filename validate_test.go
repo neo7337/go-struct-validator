@@ -57,10 +57,10 @@ type DefMessage struct {
 
 func TestDefConstraint(t *testing.T) {
 	msg := DefMessage{
-		Count: 15,
+		Count: 12,
 	}
 	sv := validator.NewStructValidator()
 	if err := sv.Validate(msg); err != nil {
-		t.Errorf("Error in validation: %d", err)
+		t.Errorf("Error in validation: %s", err)
 	}
 }

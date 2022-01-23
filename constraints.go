@@ -11,21 +11,21 @@ import (
 Base Constraints for all Data Types
 */
 
-func required(val interface{}, typ reflect.Type, param string) error {
-	v, _ := val.(string)
-	fmt.Println(v)
-	// c, _ := strconv.ParseBool(param)
-	if val == nil {
-		return ErrRequired
-	}
+func required(val reflect.Value, typ reflect.Type, param string) error {
+	//v, _ := val.(string)
+	//fmt.Println(v)
+	//// c, _ := strconv.ParseBool(param)
+	//if val == nil {
+	//	return ErrRequired
+	//}
 	return nil
 }
 
-func nillable(v interface{}, typ reflect.Type, param string) error {
+func nillable(v reflect.Value, typ reflect.Type, param string) error {
 	return nil
 }
 
-func def(v interface{}, typ reflect.Type, param string) error {
+func def(v reflect.Value, typ reflect.Type, param string) error {
 	return nil
 }
 
@@ -33,33 +33,41 @@ func def(v interface{}, typ reflect.Type, param string) error {
 Numerical Type Constraints
 */
 
-func min(val interface{}, typ reflect.Type, param string) error {
-	input := reflect.ValueOf(val)
+func min(val reflect.Value, typ reflect.Type, param string) error {
 	valid := true
-	fmt.Println(input.Convert(typ))
 	switch typ.Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		c, err := convertInt(param)
+	case reflect.Int:
+		c, err := convertInt(param, 0)
 		if err != nil {
 			return err
 		}
-		in := val.(int)
-		fmt.Println(in)
-		fmt.Println(c)
-		//valid = in < c
-		fmt.Println(valid)
+		cInt := int(c)
+		in, _ := val.Interface().(int)
+		valid = in > cInt
+	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		/*c, err := convertInt(param)
+		if err != nil {
+			return err
+		}
+		in := val.Interface().(int8)
+		valid = in > c*/
+		valid = true
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		c, err := convertUint(param)
+		/*c, err := convertUint(param)
 		if err != nil {
 			return err
 		}
-		valid = input.Uint() < c
-	case reflect.Float32, reflect.Float64:
-		c, err := convertFloat(param)
+		valid = input.Uint() < c*/
+		valid = true
+	case reflect.Float32:
+		/*c, err := convertFloat(param)
 		if err != nil {
 			return err
 		}
-		valid = input.Float() < c
+		valid = input.Float() < c*/
+		valid = true
+	case reflect.Float64:
+		valid = true
 	}
 	if !valid {
 		return ErrMin
@@ -67,16 +75,56 @@ func min(val interface{}, typ reflect.Type, param string) error {
 	return nil
 }
 
-func max(val interface{}, typ reflect.Type, param string) error {
-	v, _ := strconv.Atoi(fmt.Sprintln(val))
+func max(val reflect.Value, typ reflect.Type, param string) error {
+	/*v, _ := strconv.Atoi(fmt.Sprintln(val))
 	c, _ := strconv.Atoi(param)
 	if v < c {
 		return ErrMax
 	}
+	return nil*/
+
+	valid := true
+	switch typ.Kind() {
+	case reflect.Int:
+		c, err := convertInt(param, 0)
+		if err != nil {
+			return err
+		}
+		cInt := int(c)
+		in, _ := val.Interface().(int)
+		valid = in > cInt
+	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		/*c, err := convertInt(param)
+		if err != nil {
+			return err
+		}
+		in := val.Interface().(int8)
+		valid = in > c*/
+		valid = true
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		/*c, err := convertUint(param)
+		if err != nil {
+			return err
+		}
+		valid = input.Uint() < c*/
+		valid = true
+	case reflect.Float32:
+		/*c, err := convertFloat(param)
+		if err != nil {
+			return err
+		}
+		valid = input.Float() < c*/
+		valid = true
+	case reflect.Float64:
+		valid = true
+	}
+	if !valid {
+		return ErrMin
+	}
 	return nil
 }
 
-func exclusiveMin(val interface{}, typ reflect.Type, param string) error {
+func exclusiveMin(val reflect.Value, typ reflect.Type, param string) error {
 	valid := true
 	input := reflect.ValueOf(val)
 	switch input.Kind() {
@@ -119,7 +167,7 @@ func exclusiveMin(val interface{}, typ reflect.Type, param string) error {
 	return nil
 }
 
-func exclusiveMax(val interface{}, typ reflect.Type, param string) error {
+func exclusiveMax(val reflect.Value, typ reflect.Type, param string) error {
 	valid := true
 	input := reflect.ValueOf(val)
 	switch input.Kind() {
@@ -182,7 +230,7 @@ func exclusiveMax(val interface{}, typ reflect.Type, param string) error {
 	return nil
 }
 
-func multipleOf(v interface{}, typ reflect.Type, param string) error {
+func multipleOf(v reflect.Value, typ reflect.Type, param string) error {
 	return nil
 }
 
@@ -190,7 +238,7 @@ func multipleOf(v interface{}, typ reflect.Type, param string) error {
 String Type Constraints
 */
 
-func minLength(val interface{}, typ reflect.Type, param string) error {
+func minLength(val reflect.Value, typ reflect.Type, param string) error {
 	lc, _ := strconv.Atoi(param)
 	lv := len(fmt.Sprint(val))
 	if lv < lc {
@@ -200,7 +248,7 @@ func minLength(val interface{}, typ reflect.Type, param string) error {
 	return nil
 }
 
-func maxLength(val interface{}, typ reflect.Type, param string) error {
+func maxLength(val reflect.Value, typ reflect.Type, param string) error {
 	lc, _ := strconv.Atoi(param)
 	lv := len(fmt.Sprint(val))
 	if lv > lc {
@@ -209,40 +257,6 @@ func maxLength(val interface{}, typ reflect.Type, param string) error {
 	return nil
 }
 
-func pattern(v interface{}, typ reflect.Type, param string) error {
+func pattern(v reflect.Value, typ reflect.Type, param string) error {
 	return nil
-}
-
-/**
-utils
-*/
-/**
-constraints conversion from string
-*/
-func convertInt(param string) (int64, error) {
-	i, err := strconv.ParseInt(param, 0, 64)
-	if err != nil {
-		return 0, ErrBadConstraint
-	}
-	return i, nil
-}
-
-func convertUint(param string) (uint64, error) {
-	i, err := strconv.ParseUint(param, 0, 64)
-	if err != nil {
-		return 0, ErrBadConstraint
-	}
-	return i, nil
-}
-
-func convertFloat(param string) (float64, error) {
-	i, err := strconv.ParseFloat(param, 64)
-	if err != nil {
-		return 0, ErrBadConstraint
-	}
-	return i, nil
-}
-
-func convertToDesiredType() {
-
 }

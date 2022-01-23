@@ -9,7 +9,7 @@ import (
 
 var mandatory = [...]string{"required", "nillable"}
 
-type StructValidatorFunc func(v interface{}, typ reflect.Type, param string) error
+type StructValidatorFunc func(v reflect.Value, typ reflect.Type, param string) error
 
 type StructValidator struct {
 	validationFuncs map[string]StructValidatorFunc
