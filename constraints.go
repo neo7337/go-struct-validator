@@ -240,6 +240,17 @@ func exclusiveMax(val reflect.Value, typ reflect.Type, param string) error {
 }
 
 func multipleOf(val reflect.Value, typ reflect.Type, param string) error {
+	valid := true
+	in, _ := val.Interface().(int)
+	c, err := convertInt(param, 0)
+	cInt := int(c)
+	if err != nil {
+		return err
+	}
+	valid = in%cInt == 0
+	if !valid {
+		return ErrMultipleOf
+	}
 	return nil
 }
 

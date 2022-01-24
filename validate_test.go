@@ -6,7 +6,7 @@ import (
 )
 
 /**
-mandatory constraint validation
+mandatory constraint validations test
 */
 type ReqMsg struct {
 	Name string `json:"name" constraints:"min-length=5"`
@@ -44,7 +44,7 @@ func TestSuccessValidation(t *testing.T) {
 }
 
 /**
-min, max validation
+min, max validations test
 */
 
 type NumStruct struct {
@@ -88,7 +88,7 @@ func TestRequiredConstraintSuccess(t *testing.T) {
 }
 
 /**
-min-length, max-length validation
+min-length, max-length validations test
 */
 
 type StrStruct struct {
@@ -128,5 +128,33 @@ func TestStrConstraint(t *testing.T) {
 	want3 := "max-length validation failed"
 	if got3 != want3 {
 		t.Errorf("Expected: %s, got: %s", got3, want3)
+	}
+}
+
+/**
+multiple validations test
+*/
+type ValStruct struct {
+	Num int `json:"num" constraints:"required=true,nillable=true,multipleOf=5"`
+}
+
+func TestValConstraint(t *testing.T) {
+	msg1 := ValStruct{
+		Num: 10,
+	}
+	sv1 := validator.NewStructValidator()
+	if err := sv1.Validate(msg1); err != nil {
+		t.Errorf("Error in validation: %s", err)
+	}
+
+	msg2 := ValStruct{
+		Num: 11,
+	}
+	sv2 := validator.NewStructValidator()
+	err2 := sv2.Validate(msg2)
+	got2 := err2.Error()
+	want2 := "multipleOf validation failed"
+	if got2 != want2 {
+		t.Errorf("Expected: %s, got: %s", got2, want2)
 	}
 }
