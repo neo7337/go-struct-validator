@@ -5,9 +5,6 @@ import (
 )
 
 /**
-utils
-*/
-/**
 constraints conversion from string
 */
 
@@ -20,7 +17,7 @@ func convertInt(param string, bit int) (int64, error) {
 }
 
 func convertUint(param string, bit int) (uint64, error) {
-	i, err := strconv.ParseUint(param, 0, 64)
+	i, err := strconv.ParseUint(param, 0, bit)
 	if err != nil {
 		return 0, ErrBadConstraint
 	}
@@ -28,7 +25,7 @@ func convertUint(param string, bit int) (uint64, error) {
 }
 
 func convertFloat(param string, bit int) (float64, error) {
-	i, err := strconv.ParseFloat(param, 64)
+	i, err := strconv.ParseFloat(param, bit)
 	if err != nil {
 		return 0, ErrBadConstraint
 	}

@@ -21,11 +21,11 @@ func required(val reflect.Value, typ reflect.Type, param string) error {
 	return nil
 }
 
-func nillable(v reflect.Value, typ reflect.Type, param string) error {
+func nillable(val reflect.Value, typ reflect.Type, param string) error {
 	return nil
 }
 
-func def(v reflect.Value, typ reflect.Type, param string) error {
+func def(val reflect.Value, typ reflect.Type, param string) error {
 	return nil
 }
 
@@ -76,13 +76,6 @@ func min(val reflect.Value, typ reflect.Type, param string) error {
 }
 
 func max(val reflect.Value, typ reflect.Type, param string) error {
-	/*v, _ := strconv.Atoi(fmt.Sprintln(val))
-	c, _ := strconv.Atoi(param)
-	if v < c {
-		return ErrMax
-	}
-	return nil*/
-
 	valid := true
 	switch typ.Kind() {
 	case reflect.Int:
@@ -92,7 +85,7 @@ func max(val reflect.Value, typ reflect.Type, param string) error {
 		}
 		cInt := int(c)
 		in, _ := val.Interface().(int)
-		valid = in > cInt
+		valid = in < cInt
 	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		/*c, err := convertInt(param)
 		if err != nil {
@@ -101,7 +94,16 @@ func max(val reflect.Value, typ reflect.Type, param string) error {
 		in := val.Interface().(int8)
 		valid = in > c*/
 		valid = true
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+	case reflect.Uint:
+		c, err := convertUint(param, 0)
+		if err != nil {
+			return err
+		}
+		cUint := uint(c)
+		in, _ := val.Interface().(uint)
+		valid = in < cUint
+		valid = true
+	case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		/*c, err := convertUint(param)
 		if err != nil {
 			return err
@@ -109,17 +111,24 @@ func max(val reflect.Value, typ reflect.Type, param string) error {
 		valid = input.Uint() < c*/
 		valid = true
 	case reflect.Float32:
-		/*c, err := convertFloat(param)
+		c, err := convertFloat(param, 32)
 		if err != nil {
 			return err
 		}
-		valid = input.Float() < c*/
-		valid = true
+		cFloat := float32(c)
+		in, _ := val.Interface().(float32)
+		valid = in < cFloat
 	case reflect.Float64:
-		valid = true
+		c, err := convertFloat(param, 64)
+		if err != nil {
+			return err
+		}
+		cFloat := c
+		in, _ := val.Interface().(float64)
+		valid = in < cFloat
 	}
 	if !valid {
-		return ErrMin
+		return ErrMax
 	}
 	return nil
 }
@@ -230,7 +239,7 @@ func exclusiveMax(val reflect.Value, typ reflect.Type, param string) error {
 	return nil
 }
 
-func multipleOf(v reflect.Value, typ reflect.Type, param string) error {
+func multipleOf(val reflect.Value, typ reflect.Type, param string) error {
 	return nil
 }
 
@@ -239,24 +248,27 @@ String Type Constraints
 */
 
 func minLength(val reflect.Value, typ reflect.Type, param string) error {
+	valid := true
 	lc, _ := strconv.Atoi(param)
 	lv := len(fmt.Sprint(val))
-	if lv < lc {
-		fmt.Println("error")
+	valid = lv > lc
+	if !valid {
 		return ErrMinLength
 	}
 	return nil
 }
 
 func maxLength(val reflect.Value, typ reflect.Type, param string) error {
+	valid := true
 	lc, _ := strconv.Atoi(param)
 	lv := len(fmt.Sprint(val))
-	if lv > lc {
+	valid = lv < lc
+	if !valid {
 		return ErrMaxLength
 	}
 	return nil
 }
 
-func pattern(v reflect.Value, typ reflect.Type, param string) error {
+func pattern(val reflect.Value, typ reflect.Type, param string) error {
 	return nil
 }
