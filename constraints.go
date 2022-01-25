@@ -12,12 +12,23 @@ Base Constraints for all Data Types
 */
 
 func required(val reflect.Value, typ reflect.Type, param string) error {
-	//v, _ := val.(string)
-	//fmt.Println(v)
-	//// c, _ := strconv.ParseBool(param)
-	//if val == nil {
-	//	return ErrRequired
-	//}
+	switch typ.Kind() {
+	case reflect.String:
+		c, err := convertBool(param)
+		if err != nil {
+			return err
+		}
+		if c == true {
+			in, _ := val.Interface().(string)
+			if in == "" {
+				return ErrRequired
+			}
+		}
+	case reflect.Bool:
+	case reflect.Int:
+	case reflect.Float32:
+	case reflect.Uint:
+	}
 	return nil
 }
 

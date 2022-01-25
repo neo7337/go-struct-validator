@@ -3,9 +3,12 @@ package validator
 import (
 	"errors"
 	"fmt"
+	"go.nandlabs.io/l3"
 	"reflect"
 	"strings"
 )
+
+var logger = l3.Get()
 
 var mandatory = [...]string{"required", "nillable"}
 
@@ -46,7 +49,7 @@ func NewStructValidator() *StructValidator {
 func (sv *StructValidator) Validate(v interface{}) error {
 
 	// add a logic to check for the empty struct input in order to skip the validation of the struct
-
+	logger.Info("starting struct validation")
 	value := reflect.ValueOf(v)
 	typ := value.Type()
 	for i := 0; i < typ.NumField(); i++ {
@@ -78,6 +81,7 @@ func parseTag(tag string) map[string]string {
 func (sv *StructValidator) executeValidators(value reflect.Value, typ reflect.Type, constraint map[string]string) error {
 	for i, v := range constraint {
 		if err := sv.validationFuncs[i](value, typ, v); err != nil {
+			logger.ErrorF("constraint validation failed")
 			return err
 		} else {
 			continue
@@ -89,6 +93,7 @@ func (sv *StructValidator) executeValidators(value reflect.Value, typ reflect.Ty
 func (sv *StructValidator) checkIfMandatoryTagPresent(constraint map[string]string) error {
 	for _, v := range mandatory {
 		if _, ok := constraint[v]; !ok {
+			logger.ErrorF("mandatory field `%s` not present", v)
 			return errors.New(fmt.Sprintf("mandatory field %s not present", v))
 		}
 	}

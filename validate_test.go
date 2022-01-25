@@ -134,12 +134,12 @@ func TestStrConstraint(t *testing.T) {
 /**
 multiple validations test
 */
-type ValStruct struct {
+type MulStruct struct {
 	Num int `json:"num" constraints:"required=true,nillable=true,multipleOf=5"`
 }
 
 func TestValConstraint(t *testing.T) {
-	msg1 := ValStruct{
+	msg1 := MulStruct{
 		Num: 10,
 	}
 	sv1 := validator.NewStructValidator()
@@ -147,13 +147,42 @@ func TestValConstraint(t *testing.T) {
 		t.Errorf("Error in validation: %s", err)
 	}
 
-	msg2 := ValStruct{
+	msg2 := MulStruct{
 		Num: 11,
 	}
 	sv2 := validator.NewStructValidator()
 	err2 := sv2.Validate(msg2)
 	got2 := err2.Error()
 	want2 := "multipleOf validation failed"
+	if got2 != want2 {
+		t.Errorf("Expected: %s, got: %s", got2, want2)
+	}
+}
+
+/**
+required validations test
+*/
+
+type ReqStruct struct {
+	Name string `json:"name" constraints:"required=true,nillable=false"`
+}
+
+func TestReqConstraints(t *testing.T) {
+	msg1 := ReqStruct{
+		Name: "abcd",
+	}
+	sv1 := validator.NewStructValidator()
+	if err := sv1.Validate(msg1); err != nil {
+		t.Errorf("Error in validation: %s", err)
+	}
+
+	msg2 := ReqStruct{
+		Name: "",
+	}
+	sv2 := validator.NewStructValidator()
+	err2 := sv2.Validate(msg2)
+	got2 := err2.Error()
+	want2 := "required validation failed"
 	if got2 != want2 {
 		t.Errorf("Expected: %s, got: %s", got2, want2)
 	}

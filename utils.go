@@ -31,3 +31,11 @@ func convertFloat(param string, bit int) (float64, error) {
 	}
 	return i, nil
 }
+
+func convertBool(param string) (bool, error) {
+	i, err := strconv.ParseBool(param)
+	if err != nil {
+		return false, ErrBadConstraint
+	}
+	return i, nil
+}
