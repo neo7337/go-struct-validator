@@ -31,8 +31,10 @@ func NewStructValidator() *StructValidator {
 			"nillable": nillable,
 			"default":  def,
 			// Numeric Constraints
-			"min":          min,
-			"max":          max,
+			// <, > only
+			"min": min,
+			"max": max,
+			// <=, >= this is inclusive of the input value
 			"exclusiveMin": exclusiveMin,
 			"exclusiveMax": exclusiveMax,
 			"multipleOf":   multipleOf,

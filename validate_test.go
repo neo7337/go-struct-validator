@@ -88,6 +88,26 @@ func TestRequiredConstraintSuccess(t *testing.T) {
 }
 
 /**
+exclusive min/max validation test
+*/
+
+type ExlStruct struct {
+	MinC int `json:"minC" constraints:"required=true,nillable=true,exclusiveMin=10"`
+	MaxC int `json:"maxC" constraints:"required=true,nillable=true,exclusiveMax=50"`
+}
+
+func TestExlConstraint(t *testing.T) {
+	msg1 := ExlStruct{
+		MinC: 10,
+		MaxC: 50,
+	}
+	sv1 := validator.NewStructValidator()
+	if err := sv1.Validate(msg1); err != nil {
+		t.Errorf("Error in validation: %s", err)
+	}
+}
+
+/**
 min-length, max-length validations test
 */
 
