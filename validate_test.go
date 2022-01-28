@@ -207,3 +207,32 @@ func TestReqConstraints(t *testing.T) {
 		t.Errorf("Expected: %s, got: %s", got2, want2)
 	}
 }
+
+/**
+pattern validations
+*/
+
+type PattStruct struct {
+	Str string `json:"str" constraints:"required=true,nillable=false,pattern=^[tes]{4}.*"`
+}
+
+func TestPatternConstraints(t *testing.T) {
+	msg1 := PattStruct{
+		Str: "test1234",
+	}
+	sv1 := validator.NewStructValidator()
+	if err := sv1.Validate(msg1); err != nil {
+		t.Errorf("Error in validation: %s", err)
+	}
+
+	msg2 := PattStruct{
+		Str: "abcd1234",
+	}
+	sv2 := validator.NewStructValidator()
+	err2 := sv2.Validate(msg2)
+	got2 := err2.Error()
+	want2 := "pattern validation failed"
+	if got2 != want2 {
+		t.Errorf("Expected: %s, got: %s", got2, want2)
+	}
+}

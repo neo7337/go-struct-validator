@@ -34,4 +34,6 @@ var (
 	ErrPattern = ErrMsg{errors.New("pattern validation failed")}
 
 	ErrBadConstraint = ErrMsg{errors.New("invalid constraint value")}
+
+	ErrNotSupported = ErrMsg{errors.New("unsupported constraint on type")}
 )

@@ -3,6 +3,7 @@ package validator
 import (
 	"fmt"
 	"reflect"
+	"regexp"
 	"strconv"
 )
 
@@ -104,5 +105,16 @@ func maxLength(val reflect.Value, typ reflect.Type, param string) error {
 }
 
 func pattern(val reflect.Value, typ reflect.Type, param string) error {
+	in, _ := val.Interface().(string)
+	if typ.Kind() != reflect.String {
+		return ErrNotSupported
+	}
+	re, err := regexp.Compile(param)
+	if err != nil {
+		return ErrBadConstraint
+	}
+	if !re.MatchString(in) {
+		return ErrPattern
+	}
 	return nil
 }
