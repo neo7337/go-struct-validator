@@ -216,6 +216,10 @@ type PattStruct struct {
 	Str string `json:"str" constraints:"required=true,nillable=false,pattern=^[tes]{4}.*"`
 }
 
+type PattStruct2 struct {
+	Str2 string `json:"str2" constraints:"required=true,nillable=false,pattern=["`
+}
+
 func TestPatternConstraints(t *testing.T) {
 	msg1 := PattStruct{
 		Str: "test1234",
@@ -234,5 +238,16 @@ func TestPatternConstraints(t *testing.T) {
 	want2 := "pattern validation failed"
 	if got2 != want2 {
 		t.Errorf("Expected: %s, got: %s", got2, want2)
+	}
+
+	msg3 := PattStruct2{
+		Str2: "tsst1234",
+	}
+	sv3 := validator.NewStructValidator()
+	err3 := sv3.Validate(msg3)
+	got3 := err3.Error()
+	want3 := "invalid constraint value"
+	if got3 != want3 {
+		t.Errorf("Expected: %s, got: %s", got3, want3)
 	}
 }
