@@ -52,9 +52,6 @@ func max(val reflect.Value, typ reflect.Type, param string) error {
 	return checkMax(val, typ, param, false)
 }
 
-/**
-move the below functions to a generic function to consider the both min and exclusive-min
-*/
 func exclusiveMin(val reflect.Value, typ reflect.Type, param string) error {
 	return checkMin(val, typ, param, true)
 }
@@ -64,6 +61,7 @@ func exclusiveMax(val reflect.Value, typ reflect.Type, param string) error {
 }
 
 func multipleOf(val reflect.Value, typ reflect.Type, param string) error {
+	// TODO : works only for int as of now
 	valid := true
 	in, _ := val.Interface().(int)
 	c, err := convertInt(param, 0)

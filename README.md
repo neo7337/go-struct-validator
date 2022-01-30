@@ -6,6 +6,7 @@ The struct validator is a generic solution to manage the structs validation in g
 ---
 
 - [Installation](#installation)
+- [WIP](#workinprogress)
 
 ---
 
@@ -14,3 +15,8 @@ The struct validator is a generic solution to manage the structs validation in g
 ```bash
 go get ____
 ```
+
+### WIP
+1. Base Struct Validator
+2. Enums Validation 
+3. Nested Struct Validation

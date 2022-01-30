@@ -49,7 +49,6 @@ func NewStructValidator() *StructValidator {
 }
 
 func (sv *StructValidator) Validate(v interface{}) error {
-
 	// add a logic to check for the empty struct input in order to skip the validation of the struct
 	logger.Info("starting struct validation")
 	value := reflect.ValueOf(v)
