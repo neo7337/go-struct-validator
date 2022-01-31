@@ -50,10 +50,7 @@ func NewStructValidator() *StructValidator {
 
 func (sv *StructValidator) Validate(v interface{}) error {
 	logger.Info("starting struct validation")
-	if v == reflect.Zero(reflect.TypeOf(v)).Interface() {
-		logger.Info("Struct to be validated empty. Skipping struct validation.")
-		return nil
-	}
+	// add a logic to check for the empty struct input in order to skip the validation of the struct
 	if err := sv.deepFields(v); err != nil {
 		return err
 	}
@@ -63,7 +60,6 @@ func (sv *StructValidator) Validate(v interface{}) error {
 func (sv *StructValidator) deepFields(itr interface{}) error {
 	ifv := reflect.ValueOf(itr)
 	ift := ifv.Type()
-
 	for i := 0; i < ift.NumField(); i++ {
 		vi := ifv.Field(i)
 		v := ift.Field(i)

@@ -292,7 +292,7 @@ Empty Struct Validation
 */
 
 type EmptyExample struct {
-	Field string `json:"field"`
+	Field string `json:"field" constraints:"required=false,nillable=false"`
 }
 
 func TestEmptyStruct(t *testing.T) {
@@ -301,4 +301,5 @@ func TestEmptyStruct(t *testing.T) {
 	if err := sv.Validate(msg); err != nil {
 		t.Errorf("Error in validation: %s", err)
 	}
+
 }
