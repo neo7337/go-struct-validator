@@ -49,20 +49,39 @@ func NewStructValidator() *StructValidator {
 }
 
 func (sv *StructValidator) Validate(v interface{}) error {
-	// add a logic to check for the empty struct input in order to skip the validation of the struct
 	logger.Info("starting struct validation")
-	value := reflect.ValueOf(v)
-	typ := value.Type()
-	for i := 0; i < typ.NumField(); i++ {
-		f := typ.Field(i)
-		tag := f.Tag.Get("constraints")
-		constraints := parseTag(tag)
-		fieldValue := value.Field(i)
-		if err := sv.checkIfMandatoryTagPresent(constraints); err != nil {
-			return err
-		}
-		if err := sv.executeValidators(fieldValue, f.Type, constraints); err != nil {
-			return err
+	if v == reflect.Zero(reflect.TypeOf(v)).Interface() {
+		logger.Info("Struct to be validated empty. Skipping struct validation.")
+		return nil
+	}
+	if err := sv.deepFields(v); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (sv *StructValidator) deepFields(itr interface{}) error {
+	ifv := reflect.ValueOf(itr)
+	ift := ifv.Type()
+
+	for i := 0; i < ift.NumField(); i++ {
+		vi := ifv.Field(i)
+		v := ift.Field(i)
+		switch v.Type.Kind() {
+		case reflect.Struct:
+			if err := sv.deepFields(vi.Interface()); err != nil {
+				return err
+			}
+		default:
+			tag := v.Tag.Get("constraints")
+			constraints := parseTag(tag)
+			fieldValue := ifv.Field(i)
+			if err := sv.checkIfMandatoryTagPresent(constraints); err != nil {
+				return err
+			}
+			if err := sv.executeValidators(fieldValue, v.Type, constraints); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

@@ -251,3 +251,54 @@ func TestPatternConstraints(t *testing.T) {
 		t.Errorf("Expected: %s, got: %s", got3, want3)
 	}
 }
+
+/**
+Nested Structure Testing
+*/
+
+type Example struct {
+	Reference
+	Summary     string      `json:"summary,omitempty" constraints:"required=true,nillable=false"`
+	Description string      `json:"description,omitempty" constraints:"required=true,nillable=false"`
+	Value       interface{} `json:"example,omitempty" constraints:"required=true,nillable=false"`
+}
+
+type Reference struct {
+	Ref         *string `json:"$ref,omitempty" constraints:"required=true,nillable=false"`
+	Summary     string  `json:"summary,omitempty" constraints:"required=true,nillable=false"`
+	Description string  `json:"description,omitempty" constraints:"required=true,nillable=false"`
+}
+
+func TestNested(t *testing.T) {
+	msg := Example{
+		Reference: Reference{
+			Ref:         nil,
+			Summary:     "ref summary",
+			Description: "ref description",
+		},
+		Summary:     "summary",
+		Description: "description",
+		Value:       nil,
+	}
+
+	sv := validator.NewStructValidator()
+	if err := sv.Validate(msg); err != nil {
+		t.Errorf("Error in validation: %s", err)
+	}
+}
+
+/**
+Empty Struct Validation
+*/
+
+type EmptyExample struct {
+	Field string `json:"field"`
+}
+
+func TestEmptyStruct(t *testing.T) {
+	msg := EmptyExample{}
+	sv := validator.NewStructValidator()
+	if err := sv.Validate(msg); err != nil {
+		t.Errorf("Error in validation: %s", err)
+	}
+}
