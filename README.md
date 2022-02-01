@@ -20,3 +20,4 @@ go get ____
 1. Base Struct Validator
 2. Enums Validation 
 3. Nested Struct Validation
+4. Benchmarking
