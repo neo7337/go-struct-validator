@@ -56,14 +56,53 @@ func checkMin(val reflect.Value, typ reflect.Type, param string, isExclusive boo
 		} else {
 			valid = in > cInt
 		}
-	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		/*c, err := convertInt(param)
+	case reflect.Int8:
+		c, err := convertInt(param, 8)
 		if err != nil {
 			return err
 		}
-		in := val.Interface().(int8)
-		valid = in > c*/
-		valid = true
+		cInt := int8(c)
+		in, _ := val.Interface().(int8)
+		if isExclusive {
+			valid = in >= cInt
+		} else {
+			valid = in > cInt
+		}
+	case reflect.Int16:
+		c, err := convertInt(param, 16)
+		if err != nil {
+			return err
+		}
+		cInt := int16(c)
+		in, _ := val.Interface().(int16)
+		if isExclusive {
+			valid = in >= cInt
+		} else {
+			valid = in > cInt
+		}
+	case reflect.Int32:
+		c, err := convertInt(param, 32)
+		if err != nil {
+			return err
+		}
+		cInt := int32(c)
+		in, _ := val.Interface().(int32)
+		if isExclusive {
+			valid = in >= cInt
+		} else {
+			valid = in > cInt
+		}
+	case reflect.Int64:
+		c, err := convertInt(param, 64)
+		if err != nil {
+			return err
+		}
+		in, _ := val.Interface().(int64)
+		if isExclusive {
+			valid = in >= c
+		} else {
+			valid = in > c
+		}
 	case reflect.Uint:
 		c, err := convertUint(param, 0)
 		if err != nil {
@@ -76,7 +115,54 @@ func checkMin(val reflect.Value, typ reflect.Type, param string, isExclusive boo
 		} else {
 			valid = in > cUint
 		}
-	case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+	case reflect.Uint8:
+		c, err := convertUint(param, 8)
+		if err != nil {
+			return err
+		}
+		cUint := uint8(c)
+		in, _ := val.Interface().(uint8)
+		if isExclusive {
+			valid = in >= cUint
+		} else {
+			valid = in > cUint
+		}
+	case reflect.Uint16:
+		c, err := convertUint(param, 16)
+		if err != nil {
+			return err
+		}
+		cUint := uint16(c)
+		in, _ := val.Interface().(uint16)
+		if isExclusive {
+			valid = in >= cUint
+		} else {
+			valid = in > cUint
+		}
+	case reflect.Uint32:
+		c, err := convertUint(param, 32)
+		if err != nil {
+			return err
+		}
+		cUint := uint32(c)
+		in, _ := val.Interface().(uint32)
+		if isExclusive {
+			valid = in >= cUint
+		} else {
+			valid = in > cUint
+		}
+	case reflect.Uint64:
+		c, err := convertUint(param, 64)
+		if err != nil {
+			return err
+		}
+		in, _ := val.Interface().(uint64)
+		if isExclusive {
+			valid = in >= c
+		} else {
+			valid = in > c
+		}
+	case reflect.Uintptr:
 		/*c, err := convertUint(param)
 		if err != nil {
 			return err
