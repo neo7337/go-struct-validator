@@ -70,6 +70,10 @@ func (sv *StructValidator) deepFields(itr interface{}) error {
 			}
 		default:
 			tag := v.Tag.Get("constraints")
+			if tag == "" {
+				logger.InfoF("constraint not present, skip to next field")
+				continue
+			}
 			constraints := parseTag(tag)
 			fieldValue := ifv.Field(i)
 			if err := sv.checkIfMandatoryTagPresent(constraints); err != nil {
