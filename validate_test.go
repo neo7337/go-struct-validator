@@ -289,6 +289,7 @@ func TestNested(t *testing.T) {
 
 /**
 Empty Struct Validation
+// TODO
 */
 
 type EmptyExample struct {
@@ -302,4 +303,20 @@ func TestEmptyStruct(t *testing.T) {
 		t.Errorf("Error in validation: %s", err)
 	}
 
+}
+
+type ConstExample struct {
+	Summary     string `json:"summary"`
+	Description string `json:"description" constraints:"required=false,nillable=false"`
+}
+
+func TestConstStruct(t *testing.T) {
+	msg := ConstExample{
+		Summary:     "testing",
+		Description: "this is testing",
+	}
+	sv := validator.NewStructValidator()
+	if err := sv.Validate(msg); err != nil {
+		t.Errorf("Error in validation: %s", err)
+	}
 }
