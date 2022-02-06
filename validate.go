@@ -49,7 +49,7 @@ func NewStructValidator() *StructValidator {
 }
 
 func (sv *StructValidator) Validate(v interface{}) error {
-	logger.Info("starting struct validation")
+	//logger.Info("starting struct validation")
 	// add a logic to check for the empty struct input in order to skip the validation of the struct
 	if err := sv.deepFields(v); err != nil {
 		return err
@@ -74,12 +74,8 @@ func (sv *StructValidator) deepFields(itr interface{}) error {
 				logger.InfoF("constraint not present for field : %s, skip to next field", v.Name)
 				continue
 			}
-			constraints := parseTag(tag)
 			fieldValue := ifv.Field(i)
-			if err := sv.checkIfMandatoryTagPresent(constraints); err != nil {
-				return err
-			}
-			if err := sv.executeValidators(fieldValue, v.Type, constraints); err != nil {
+			if err := sv.parseTag(fieldValue, tag, v.Type); err != nil {
 				return err
 			}
 		}
@@ -87,20 +83,24 @@ func (sv *StructValidator) deepFields(itr interface{}) error {
 	return nil
 }
 
-func parseTag(tag string) map[string]string {
+func (sv *StructValidator) parseTag(fieldValue reflect.Value, tag string, typ reflect.Type) error {
 	m := make(map[string]string)
 	split := strings.Split(tag, ",")
+
+	// fix this logic to check the mandatory tags
 	for _, str := range split {
 		constraintName := strings.Split(str, "=")[0]
 		constraintValue := strings.Split(str, "=")[1]
 		m[constraintName] = constraintValue
 	}
-	return m
-}
-
-func (sv *StructValidator) executeValidators(value reflect.Value, typ reflect.Type, constraint map[string]string) error {
-	for i, v := range constraint {
-		if err := sv.validationFuncs[i](value, typ, v); err != nil {
+	if err := sv.checkIfMandatoryTagPresent(m); err != nil {
+		return err
+	}
+	for _, str := range split {
+		constraintName := strings.Split(str, "=")[0]
+		constraintValue := strings.Split(str, "=")[1]
+		//m[constraintName] = constraintValue
+		if err := sv.validationFuncs[constraintName](fieldValue, typ, constraintValue); err != nil {
 			logger.ErrorF("constraint validation failed")
 			return err
 		} else {

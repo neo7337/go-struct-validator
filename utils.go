@@ -195,7 +195,11 @@ func checkMin(val reflect.Value, typ reflect.Type, param string, isExclusive boo
 		}
 	}
 	if !valid {
-		return ErrMin
+		if isExclusive {
+			return ErrExclusiveMin
+		} else {
+			return ErrMin
+		}
 	}
 	return nil
 }
@@ -354,7 +358,11 @@ func checkMax(val reflect.Value, typ reflect.Type, param string, isExclusive boo
 		}
 	}
 	if !valid {
-		return ErrMax
+		if isExclusive {
+			return ErrExclusiveMax
+		} else {
+			return ErrMax
+		}
 	}
 	return nil
 }
