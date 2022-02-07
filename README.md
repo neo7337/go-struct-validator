@@ -19,11 +19,16 @@ go get ____
 
 ### Benchmarking
 
-| S.No. |         Name         | Ops    | BenchResult |
-|:------|:--------------------:|--------|-------------|
-| 1     | BenchmarkValidator-8 | 105066 | 9718 ns/op  |
-| 2     | BenchmarkValidator-8 | 150873 | 7100 ns/op  |
-| 3     | BenchmarkValidator-8 | 170964 | 6709 ns/op  |
+```bash
+go test -run=Bench -bench=. -benchtime 5000000x
+```
+
+| S.No. |         Name         | Ops     | BenchResult |
+|:------|:--------------------:|---------|-------------|
+| 1     | BenchmarkValidator-8 | 105066  | 9718 ns/op  |
+| 2     | BenchmarkValidator-8 | 150873  | 7100 ns/op  |
+| 3     | BenchmarkValidator-8 | 170964  | 6709 ns/op  |
+| 4     | BenchmarkValidator-8 | 5000000 | 6546 ns/op  |
 
 ### WIP
 1. Base Struct Validator
