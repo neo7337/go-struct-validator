@@ -1,8 +1,6 @@
 package validator
 
 import (
-	"errors"
-	"fmt"
 	"go.nandlabs.io/l3"
 	"reflect"
 	"strings"
@@ -84,17 +82,10 @@ func (sv *StructValidator) deepFields(itr interface{}) error {
 }
 
 func (sv *StructValidator) parseTag(fieldValue reflect.Value, tag string, typ reflect.Type) error {
-	m := make(map[string]string)
 	split := strings.Split(tag, ",")
-
 	// fix this logic to check the mandatory tags
-	for _, str := range split {
-		constraintName := strings.Split(str, "=")[0]
-		constraintValue := strings.Split(str, "=")[1]
-		m[constraintName] = constraintValue
-	}
-	if err := sv.checkIfMandatoryTagPresent(m); err != nil {
-		return err
+	if err := check(split); err != true {
+		return ErrMandatoryFields
 	}
 	for _, str := range split {
 		constraintName := strings.Split(str, "=")[0]
@@ -110,12 +101,17 @@ func (sv *StructValidator) parseTag(fieldValue reflect.Value, tag string, typ re
 	return nil
 }
 
-func (sv *StructValidator) checkIfMandatoryTagPresent(constraint map[string]string) error {
-	for _, v := range mandatory {
-		if _, ok := constraint[v]; !ok {
-			logger.ErrorF("mandatory field `%s` not present", v)
-			return errors.New(fmt.Sprintf("mandatory field %s not present", v))
+func check(list []string) bool {
+	count := 0
+	for _, v := range list {
+		for _, m := range mandatory {
+			if m == strings.Split(v, "=")[0] {
+				count++
+			}
 		}
 	}
-	return nil
+	if count == len(mandatory) {
+		return true
+	}
+	return false
 }

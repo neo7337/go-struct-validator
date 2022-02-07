@@ -23,6 +23,7 @@ go get ____
 |:------|:--------------------:|--------|-------------|
 | 1     | BenchmarkValidator-8 | 105066 | 9718 ns/op  |
 | 2     | BenchmarkValidator-8 | 150873 | 7100 ns/op  |
+| 3     | BenchmarkValidator-8 | 170964 | 6709 ns/op  |
 
 ### WIP
 1. Base Struct Validator

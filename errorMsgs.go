@@ -36,4 +36,6 @@ var (
 	ErrBadConstraint = ErrMsg{errors.New("invalid constraint value")}
 
 	ErrNotSupported = ErrMsg{errors.New("unsupported constraint on type")}
+
+	ErrMandatoryFields = ErrMsg{errors.New("mandatory fields not present")}
 )
