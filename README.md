@@ -35,3 +35,4 @@ go test -run=Bench -bench=. -benchtime 5000000x
 2. Enums Validation 
 3. Nested Struct Validation
 4. Benchmarking
+5. Cache Implementation

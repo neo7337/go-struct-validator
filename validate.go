@@ -4,6 +4,7 @@ import (
 	"go.nandlabs.io/l3"
 	"reflect"
 	"strings"
+	"sync"
 )
 
 var logger = l3.Get()
@@ -12,14 +13,26 @@ var mandatory = [...]string{"required", "nillable"}
 
 type StructValidatorFunc func(v reflect.Value, typ reflect.Type, param string) error
 
-type StructValidator struct {
-	validationFuncs map[string]StructValidatorFunc
-	tagName         string
+type field struct {
+	name        string
+	constraints sync.Map //map[string]string
 }
+
+type structFields struct {
+	list []field
+}
+
+type StructValidator struct {
+	fields         structFields
+	validationFunc map[string]StructValidatorFunc
+	tagName        string
+}
+
+var validatorCache sync.Map
 
 func NewStructValidator() *StructValidator {
 	return &StructValidator{
-		validationFuncs: map[string]StructValidatorFunc{
+		validationFunc: map[string]StructValidatorFunc{
 			// Base Constraints
 			// boolean value
 			// mandatory field
@@ -49,10 +62,23 @@ func NewStructValidator() *StructValidator {
 func (sv *StructValidator) Validate(v interface{}) error {
 	//logger.Info("starting struct validation")
 	// add a logic to check for the empty struct input in order to skip the validation of the struct
+
+	//check for cache
+	val := StructValidator{fields: cachedTypeFields(reflect.ValueOf(v).Type())}
+	if err := val.validateFields(); err != nil {
+		return err
+	}
+
 	if err := sv.deepFields(v); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (sv *StructValidator) validateFields() error {
+	for i, v = range sv.fields.list {
+
+	}
 }
 
 func (sv *StructValidator) deepFields(itr interface{}) error {
@@ -90,8 +116,7 @@ func (sv *StructValidator) parseTag(fieldValue reflect.Value, tag string, typ re
 	for _, str := range split {
 		constraintName := strings.Split(str, "=")[0]
 		constraintValue := strings.Split(str, "=")[1]
-		//m[constraintName] = constraintValue
-		if err := sv.validationFuncs[constraintName](fieldValue, typ, constraintValue); err != nil {
+		if err := sv.validationFunc[constraintName](fieldValue, typ, constraintValue); err != nil {
 			logger.ErrorF("constraint validation failed")
 			return err
 		} else {
@@ -114,4 +139,18 @@ func check(list []string) bool {
 		return true
 	}
 	return false
+}
+
+func parseFields(t reflect.Type) structFields {
+
+}
+
+var fieldCache sync.Map //map[reflect.Type]structFields
+
+func cachedTypeFields(t reflect.Type) structFields {
+	if f, ok := fieldCache.Load(t); ok {
+		return f.(structFields)
+	}
+	f, _ := fieldCache.LoadOrStore(t, parseFields(t))
+	return f.(structFields)
 }
