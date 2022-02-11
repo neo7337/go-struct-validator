@@ -15,7 +15,10 @@ type StructValidatorFunc func(v reflect.Value, typ reflect.Type, param string) e
 
 type field struct {
 	name        string
-	constraints sync.Map //map[string]string
+	value       reflect.Value
+	typ         reflect.Type
+	index       []int
+	constraints map[string]string
 }
 
 type structFields struct {
@@ -27,8 +30,6 @@ type StructValidator struct {
 	validationFunc map[string]StructValidatorFunc
 	tagName        string
 }
-
-var validatorCache sync.Map
 
 func NewStructValidator() *StructValidator {
 	return &StructValidator{
@@ -64,21 +65,26 @@ func (sv *StructValidator) Validate(v interface{}) error {
 	// add a logic to check for the empty struct input in order to skip the validation of the struct
 
 	//check for cache
-	val := StructValidator{fields: cachedTypeFields(reflect.ValueOf(v).Type())}
-	if err := val.validateFields(); err != nil {
+	sv.fields = cachedTypeFields(v)
+	if err := sv.validateFields(); err != nil {
 		return err
 	}
 
-	if err := sv.deepFields(v); err != nil {
+	/*if err := sv.deepFields(v); err != nil {
 		return err
-	}
+	}*/
 	return nil
 }
 
 func (sv *StructValidator) validateFields() error {
-	for i, v = range sv.fields.list {
-
+	for _, v := range sv.fields.list {
+		for k, val := range v.constraints {
+			if err := sv.validationFunc[k](v.value, v.typ, val); err != nil {
+				return err
+			}
+		}
 	}
+	return nil
 }
 
 func (sv *StructValidator) deepFields(itr interface{}) error {
@@ -98,6 +104,7 @@ func (sv *StructValidator) deepFields(itr interface{}) error {
 				logger.InfoF("constraint not present for field : %s, skip to next field", v.Name)
 				continue
 			}
+
 			fieldValue := ifv.Field(i)
 			if err := sv.parseTag(fieldValue, tag, v.Type); err != nil {
 				return err
@@ -141,16 +148,96 @@ func check(list []string) bool {
 	return false
 }
 
-func parseFields(t reflect.Type) structFields {
+//parseTag returns the map of constraints
+func parseTag(tag string) map[string]string {
+	m := make(map[string]string)
+	split := strings.Split(tag, ",")
+	for _, str := range split {
+		constraintName := strings.Split(str, "=")[0]
+		constraintValue := strings.Split(str, "=")[1]
+		m[constraintName] = constraintValue
+	}
+	return m
+}
 
+func parseFields(v interface{}) structFields {
+
+	t := reflect.ValueOf(v).Type()
+	fv := reflect.ValueOf(v)
+
+	current := []field{}
+	next := []field{{typ: t}}
+
+	var count, nextCount map[reflect.Type]int
+
+	visited := map[reflect.Type]bool{}
+
+	var fields []field
+
+	for len(next) > 0 {
+		current, next = next, current[:0]
+		count, nextCount = nextCount, map[reflect.Type]int{}
+
+		for _, f := range current {
+			if visited[f.typ] {
+				continue
+			}
+			visited[f.typ] = true
+
+			for i := 0; i < f.typ.NumField(); i++ {
+				sf := f.typ.Field(i)
+				if sf.Anonymous {
+					t := sf.Type
+					if t.Kind() == reflect.Ptr {
+						t = t.Elem()
+					}
+				}
+				tag := sf.Tag.Get("constraints")
+				if tag == "-" {
+					continue
+				}
+				consts := parseTag(tag)
+
+				index := make([]int, len(f.index)+1)
+				copy(index, f.index)
+				index[len(f.index)] = i
+
+				ft := sf.Type
+				if ft.Name() == "" && ft.Kind() == reflect.Ptr {
+					ft = ft.Elem()
+				}
+				if !sf.Anonymous || ft.Kind() != reflect.Struct {
+					field := field{
+						name:        sf.Name,
+						typ:         ft,
+						constraints: consts,
+						value:       fv.Field(i),
+					}
+
+					fields = append(fields, field)
+					if count[f.typ] > 1 {
+						fields = append(fields, fields[len(fields)-1])
+					}
+					continue
+				}
+
+				nextCount[ft]++
+				if nextCount[ft] == 1 {
+					next = append(next, field{name: ft.Name(), index: index, typ: ft})
+				}
+			}
+		}
+	}
+	return structFields{fields}
 }
 
 var fieldCache sync.Map //map[reflect.Type]structFields
 
-func cachedTypeFields(t reflect.Type) structFields {
+func cachedTypeFields(v interface{}) structFields {
+	t := reflect.ValueOf(v).Type()
 	if f, ok := fieldCache.Load(t); ok {
 		return f.(structFields)
 	}
-	f, _ := fieldCache.LoadOrStore(t, parseFields(t))
+	f, _ := fieldCache.LoadOrStore(t, parseFields(v))
 	return f.(structFields)
 }
