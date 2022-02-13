@@ -7,7 +7,7 @@ The struct validator is a generic solution to manage the structs validation in g
 
 - [Installation](#installation)
 - [Benchmarking](#benchmarking)
-- [WIP](#workinprogress)
+- [WIP](#wip)
 
 ---
 
@@ -29,6 +29,7 @@ go test -run=Bench -bench=. -benchtime 5000000x
 | 2     | BenchmarkValidator-8 | 150873  | 7100 ns/op  |
 | 3     | BenchmarkValidator-8 | 170964  | 6709 ns/op  |
 | 4     | BenchmarkValidator-8 | 5000000 | 6546 ns/op  |
+| 5     | BenchmarkValidator-8 | 5000000 | 1315 ns/op  |
 
 ### WIP
 1. Base Struct Validator

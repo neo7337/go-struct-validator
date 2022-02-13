@@ -5,6 +5,8 @@ import (
 	"validator"
 )
 
+var sv = validator.NewStructValidator()
+
 /**
 mandatory constraint validations test
 */
@@ -18,7 +20,6 @@ func TestRequiredConstraintFail(t *testing.T) {
 		Name: "Test",
 		Age:  11,
 	}
-	sv := validator.NewStructValidator()
 	err := sv.Validate(msg)
 	got := err.Error()
 	want := "mandatory fields not present"
@@ -37,7 +38,6 @@ func TestSuccessValidation(t *testing.T) {
 		Name: "Test",
 		Age:  11,
 	}
-	sv := validator.NewStructValidator()
 	if err := sv.Validate(msg); err != nil {
 		t.Errorf("Error in validation: %s", err)
 	}
@@ -47,213 +47,241 @@ func TestSuccessValidation(t *testing.T) {
 min, max validations test
 */
 
-type NumStruct struct {
-	MinC int `json:"minC" constraints:"required=true,nillable=true,min=10"`
-	MaxC int `json:"maxC" constraints:"required=true,nillable=true,max=49"`
-}
+func TestNumericValidations(t *testing.T) {
 
-func TestRequiredConstraintSuccess(t *testing.T) {
-	msg1 := NumStruct{
-		MinC: 12,
-		MaxC: 45,
-	}
-	sv1 := validator.NewStructValidator()
-	if err := sv1.Validate(msg1); err != nil {
-		t.Errorf("Error in validation: %s", err)
-	}
-
-	msg2 := NumStruct{
-		MinC: 7,
-		MaxC: 45,
-	}
-	sv2 := validator.NewStructValidator()
-	err2 := sv2.Validate(msg2)
-	got2 := err2.Error()
-	want2 := "min value validation failed"
-	if got2 != want2 {
-		t.Errorf("Expected: %s, got: %s", got2, want2)
-	}
-
-	msg3 := NumStruct{
-		MinC: 12,
-		MaxC: 55,
-	}
-	sv3 := validator.NewStructValidator()
-	err3 := sv3.Validate(msg3)
-	got3 := err3.Error()
-	want3 := "max value validation failed"
-	if got3 != want3 {
-		t.Errorf("Expected: %s, got: %s", got3, want3)
-	}
-}
-
-/**
-exclusive min/max validation test
-*/
-
-type ExlStruct struct {
-	MinC int `json:"minC" constraints:"required=true,nillable=true,exclusiveMin=10"`
-	MaxC int `json:"maxC" constraints:"required=true,nillable=true,exclusiveMax=50"`
-}
-
-func TestExlConstraint(t *testing.T) {
-	msg1 := ExlStruct{
-		MinC: 10,
-		MaxC: 50,
-	}
-	sv1 := validator.NewStructValidator()
-	if err := sv1.Validate(msg1); err != nil {
-		t.Errorf("Error in validation: %s", err)
-	}
-}
-
-/**
-min-length, max-length validations test
-*/
-
-type StrStruct struct {
-	Str1 string `json:"str1" constraints:"required=true,nillable=true,min-length=10"`
-	Str2 string `json:"str2" constraints:"required=true,nillable=true,max-length=15"`
-}
-
-func TestStrConstraint(t *testing.T) {
-	msg1 := StrStruct{
-		Str1: "hello_world",
-		Str2: "hello_world_go",
-	}
-	sv1 := validator.NewStructValidator()
-	if err := sv1.Validate(msg1); err != nil {
-		t.Errorf("Error in validation: %s", err)
+	testsPass := []struct {
+		Name  string
+		input interface{}
+	}{
+		{
+			Name: "Test1",
+			input: struct {
+				MinC1 int `json:"minC1" constraints:"required=true,nillable=true,min=10"`
+				MaxC1 int `json:"maxC1" constraints:"required=true,nillable=true,max=49"`
+			}{MinC1: 12, MaxC1: 45},
+		},
+		/**
+		exclusive min/max validation test
+		*/
+		{
+			Name: "Test4",
+			input: struct {
+				MinC4 int `json:"minC4" constraints:"required=true,nillable=true,exclusiveMin=10"`
+				MaxC4 int `json:"maxC4" constraints:"required=true,nillable=true,exclusiveMax=50"`
+			}{MinC4: 10, MaxC4: 50},
+		},
+		{
+			Name: "Test7",
+			input: struct {
+				Num7 int `json:"num7" constraints:"required=true,nillable=true,multipleOf=5"`
+			}{Num7: 10},
+		},
 	}
 
-	msg2 := StrStruct{
-		Str1: "hell_worl",
-		Str2: "hello_world_go",
-	}
-	sv2 := validator.NewStructValidator()
-	err2 := sv2.Validate(msg2)
-	got2 := err2.Error()
-	want2 := "min-length validation failed"
-	if got2 != want2 {
-		t.Errorf("Expected: %s, got: %s", got2, want2)
+	for _, tt := range testsPass {
+		t.Run(tt.Name, func(t *testing.T) {
+			err := sv.Validate(tt.input)
+			if err != nil {
+				t.Errorf("Error in validation: %s", err)
+			}
+		})
 	}
 
-	msg3 := StrStruct{
-		Str1: "hello_world",
-		Str2: "hello_world_from_go",
+	testsError := []struct {
+		Name  string
+		input interface{}
+		want  string
+	}{
+		{
+			Name: "Test2",
+			input: struct {
+				MinC2 int `json:"minC2" constraints:"required=true,nillable=true,min=10"`
+				MaxC2 int `json:"maxC2" constraints:"required=true,nillable=true,max=49"`
+			}{MinC2: 7, MaxC2: 45},
+			want: "min value validation failed",
+		},
+		{
+			Name: "Test3",
+			input: struct {
+				MinC3 int `json:"minC3" constraints:"required=true,nillable=true,min=10"`
+				MaxC3 int `json:"maxC3" constraints:"required=true,nillable=true,max=49"`
+			}{MinC3: 12, MaxC3: 55},
+			want: "max value validation failed",
+		},
+		/**
+		exclusive min/max validation test
+		*/
+		{
+			Name: "Test5",
+			input: struct {
+				MinC5 int `json:"minC5" constraints:"required=true,nillable=true,exclusiveMin=10"`
+				MaxC5 int `json:"maxC5" constraints:"required=true,nillable=true,exclusiveMax=50"`
+			}{MinC5: 9, MaxC5: 50},
+			want: "exclusive min validation failed",
+		},
+		{
+			Name: "Test6",
+			input: struct {
+				MinC6 int `json:"minC6" constraints:"required=true,nillable=true,exclusiveMin=10"`
+				MaxC6 int `json:"maxC6" constraints:"required=true,nillable=true,exclusiveMax=50"`
+			}{MinC6: 10, MaxC6: 51},
+			want: "exclusive max validation failed",
+		},
+		{
+			Name: "Test8",
+			input: struct {
+				Num8 int `json:"num8" constraints:"required=true,nillable=true,multipleOf=5"`
+			}{Num8: 11},
+			want: "multipleOf validation failed",
+		},
 	}
-	sv3 := validator.NewStructValidator()
-	err3 := sv3.Validate(msg3)
-	got3 := err3.Error()
-	want3 := "max-length validation failed"
-	if got3 != want3 {
-		t.Errorf("Expected: %s, got: %s", got3, want3)
+
+	for _, tt := range testsError {
+		t.Run(tt.Name, func(t *testing.T) {
+			err := sv.Validate(tt.input)
+			if tt.want != err.Error() {
+				t.Errorf("Got: %s, want: %s", err, tt.want)
+			}
+		})
 	}
 }
 
-/**
-multiple validations test
-*/
-type MulStruct struct {
-	Num int `json:"num" constraints:"required=true,nillable=true,multipleOf=5"`
-}
+func TestStringValidation(t *testing.T) {
+	testsPass := []struct {
+		Name  string
+		input interface{}
+	}{
+		{
+			Name: "Test1",
+			input: struct {
+				Str1T1 string `json:"str1T1" constraints:"required=true,nillable=true,min-length=10"`
+				Str2T1 string `json:"str2T1" constraints:"required=true,nillable=true,max-length=15"`
+			}{Str1T1: "hello_world", Str2T1: "hello_world_go"},
+		},
+		/**
+		pattern validations
+		*/
+		{
+			Name: "Test4",
+			input: struct {
+				Str4 string `json:"str4" constraints:"required=true,nillable=false,pattern=^[tes]{4}.*"`
+			}{Str4: "test1234"},
+		},
+	}
 
-func TestValConstraint(t *testing.T) {
-	msg1 := MulStruct{
-		Num: 10,
-	}
-	sv1 := validator.NewStructValidator()
-	if err := sv1.Validate(msg1); err != nil {
-		t.Errorf("Error in validation: %s", err)
+	for _, tt := range testsPass {
+		t.Run(tt.Name, func(t *testing.T) {
+			err := sv.Validate(tt.input)
+			if err != nil {
+				t.Errorf("Error in validation: %s", err)
+			}
+		})
 	}
 
-	msg2 := MulStruct{
-		Num: 11,
+	testsFail := []struct {
+		Name  string
+		input interface{}
+		want  string
+	}{
+		{
+			Name: "Test2",
+			input: struct {
+				Str1T2 string `json:"str1T2" constraints:"required=true,nillable=true,min-length=10"`
+				Str2T2 string `json:"str2T2" constraints:"required=true,nillable=true,max-length=15"`
+			}{Str1T2: "hell_worl", Str2T2: "hello_world_go"},
+			want: "min-length validation failed",
+		},
+		{
+			Name: "Test3",
+			input: struct {
+				Str1T3 string `json:"str1T3" constraints:"required=true,nillable=true,min-length=10"`
+				Str2T3 string `json:"str2T3" constraints:"required=true,nillable=true,max-length=15"`
+			}{Str1T3: "hello_world", Str2T3: "hello_world_from_go"},
+			want: "max-length validation failed",
+		},
+		/**
+		pattern validations
+		*/
+		{
+			Name: "Test5",
+			input: struct {
+				Str5 string `json:"str5" constraints:"required=true,nillable=false,pattern=^[tes]{4}.*"`
+			}{Str5: "abcd1234"},
+			want: "pattern validation failed",
+		},
+		{
+			Name: "Test6",
+			input: struct {
+				Str6 string `json:"str6" constraints:"required=true,nillable=false,pattern=["`
+			}{Str6: "tsst1234"},
+			want: "invalid constraint value",
+		},
 	}
-	sv2 := validator.NewStructValidator()
-	err2 := sv2.Validate(msg2)
-	got2 := err2.Error()
-	want2 := "multipleOf validation failed"
-	if got2 != want2 {
-		t.Errorf("Expected: %s, got: %s", got2, want2)
+
+	for _, tt := range testsFail {
+		t.Run(tt.Name, func(t *testing.T) {
+			err := sv.Validate(tt.input)
+			if tt.want != err.Error() {
+				t.Errorf("Got: %s, want: %s", err, tt.want)
+			}
+		})
 	}
+
 }
 
 /**
 required validations test
 */
 
-type ReqStruct struct {
-	Name string `json:"name" constraints:"required=true,nillable=false"`
-}
+func TestReqValidation(t *testing.T) {
 
-func TestReqConstraints(t *testing.T) {
-	msg1 := ReqStruct{
-		Name: "abcd",
+	testsPass := []struct {
+		Name  string
+		input interface{}
+	}{
+		{
+			Name: "Test1",
+			input: struct {
+				Name1 string `json:"name1" constraints:"required=true,nillable=false"`
+			}{Name1: "abcd"},
+		},
 	}
-	sv1 := validator.NewStructValidator()
-	if err := sv1.Validate(msg1); err != nil {
-		t.Errorf("Error in validation: %s", err)
-	}
-
-	msg2 := ReqStruct{
-		Name: "",
-	}
-	sv2 := validator.NewStructValidator()
-	err2 := sv2.Validate(msg2)
-	got2 := err2.Error()
-	want2 := "required validation failed"
-	if got2 != want2 {
-		t.Errorf("Expected: %s, got: %s", got2, want2)
-	}
-}
-
-/**
-pattern validations
-*/
-
-type PattStruct struct {
-	Str string `json:"str" constraints:"required=true,nillable=false,pattern=^[tes]{4}.*"`
-}
-
-type PattStruct2 struct {
-	Str2 string `json:"str2" constraints:"required=true,nillable=false,pattern=["`
-}
-
-func TestPatternConstraints(t *testing.T) {
-	msg1 := PattStruct{
-		Str: "test1234",
-	}
-	sv1 := validator.NewStructValidator()
-	if err := sv1.Validate(msg1); err != nil {
-		t.Errorf("Error in validation: %s", err)
+	for _, tt := range testsPass {
+		t.Run(tt.Name, func(t *testing.T) {
+			err := sv.Validate(tt.input)
+			if err != nil {
+				t.Errorf("Error in validation: %s", err)
+			}
+		})
 	}
 
-	msg2 := PattStruct{
-		Str: "abcd1234",
-	}
-	sv2 := validator.NewStructValidator()
-	err2 := sv2.Validate(msg2)
-	got2 := err2.Error()
-	want2 := "pattern validation failed"
-	if got2 != want2 {
-		t.Errorf("Expected: %s, got: %s", got2, want2)
+	testsFail := []struct {
+		Name  string
+		input interface{}
+		want  string
+	}{
+		{
+			Name: "Test2",
+			input: struct {
+				Name2 string `json:"name2" constraints:"required=true,nillable=false"`
+			}{Name2: ""},
+			want: "required validation failed",
+		},
 	}
 
-	msg3 := PattStruct2{
-		Str2: "tsst1234",
-	}
-	sv3 := validator.NewStructValidator()
-	err3 := sv3.Validate(msg3)
-	got3 := err3.Error()
-	want3 := "invalid constraint value"
-	if got3 != want3 {
-		t.Errorf("Expected: %s, got: %s", got3, want3)
+	for _, tt := range testsFail {
+		t.Run(tt.Name, func(t *testing.T) {
+			err := sv.Validate(tt.input)
+			if tt.want != err.Error() {
+				t.Errorf("Got: %s, want: %s", err, tt.want)
+			}
+		})
 	}
 }
 
 /**
 Nested Structure Testing
+**Not working as per latest algo**
 */
 
 type Example struct {
@@ -264,17 +292,17 @@ type Example struct {
 }
 
 type Reference struct {
-	Ref         *string `json:"$ref,omitempty" constraints:"required=true,nillable=false"`
-	Summary     string  `json:"summary,omitempty" constraints:"required=true,nillable=false"`
-	Description string  `json:"description,omitempty" constraints:"required=true,nillable=false"`
+	Ref            string `json:"ref" constraints:"required=true,nillable=false"`
+	RefDescription string `json:"ref-description" constraints:"required=true,nillable=false"`
+	RefSummary     string `json:"ref-summary" constraints:"required=true,nillable=false"`
 }
 
 func TestNested(t *testing.T) {
 	msg := Example{
 		Reference: Reference{
-			Ref:         nil,
-			Summary:     "ref summary",
-			Description: "ref description",
+			Ref:            "reference",
+			RefSummary:     "ref summary",
+			RefDescription: "ref description",
 		},
 		Summary:     "summary",
 		Description: "description",
@@ -306,7 +334,7 @@ func TestEmptyStruct(t *testing.T) {
 }
 
 type ConstExample struct {
-	Summary     string `json:"summary"`
+	Summary     string `json:"summary" constraints:"-"`
 	Description string `json:"description" constraints:"required=false,nillable=false"`
 }
 

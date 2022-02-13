@@ -19,6 +19,7 @@ type field struct {
 	typ         reflect.Type
 	index       []int
 	constraints map[string]string
+	inter       interface{}
 }
 
 type structFields struct {
@@ -69,15 +70,14 @@ func (sv *StructValidator) Validate(v interface{}) error {
 	if err := sv.validateFields(); err != nil {
 		return err
 	}
-
-	/*if err := sv.deepFields(v); err != nil {
-		return err
-	}*/
 	return nil
 }
 
 func (sv *StructValidator) validateFields() error {
 	for _, v := range sv.fields.list {
+		if err := checkForMandatory(v.constraints); err != nil {
+			return err
+		}
 		for k, val := range v.constraints {
 			if err := sv.validationFunc[k](v.value, v.typ, val); err != nil {
 				return err
@@ -87,70 +87,21 @@ func (sv *StructValidator) validateFields() error {
 	return nil
 }
 
-func (sv *StructValidator) deepFields(itr interface{}) error {
-	ifv := reflect.ValueOf(itr)
-	ift := ifv.Type()
-	for i := 0; i < ift.NumField(); i++ {
-		vi := ifv.Field(i)
-		v := ift.Field(i)
-		switch v.Type.Kind() {
-		case reflect.Struct:
-			if err := sv.deepFields(vi.Interface()); err != nil {
-				return err
-			}
-		default:
-			tag := v.Tag.Get("constraints")
-			if tag == "" {
-				logger.InfoF("constraint not present for field : %s, skip to next field", v.Name)
-				continue
-			}
-
-			fieldValue := ifv.Field(i)
-			if err := sv.parseTag(fieldValue, tag, v.Type); err != nil {
-				return err
-			}
+func checkForMandatory(constraint map[string]string) error {
+	for _, v := range mandatory {
+		if _, ok := constraint[v]; !ok {
+			return ErrMandatoryFields
 		}
 	}
 	return nil
-}
-
-func (sv *StructValidator) parseTag(fieldValue reflect.Value, tag string, typ reflect.Type) error {
-	split := strings.Split(tag, ",")
-	// fix this logic to check the mandatory tags
-	if err := check(split); err != true {
-		return ErrMandatoryFields
-	}
-	for _, str := range split {
-		constraintName := strings.Split(str, "=")[0]
-		constraintValue := strings.Split(str, "=")[1]
-		if err := sv.validationFunc[constraintName](fieldValue, typ, constraintValue); err != nil {
-			logger.ErrorF("constraint validation failed")
-			return err
-		} else {
-			continue
-		}
-	}
-	return nil
-}
-
-func check(list []string) bool {
-	count := 0
-	for _, v := range list {
-		for _, m := range mandatory {
-			if m == strings.Split(v, "=")[0] {
-				count++
-			}
-		}
-	}
-	if count == len(mandatory) {
-		return true
-	}
-	return false
 }
 
 //parseTag returns the map of constraints
 func parseTag(tag string) map[string]string {
 	m := make(map[string]string)
+	if tag == "" {
+		return m
+	}
 	split := strings.Split(tag, ",")
 	for _, str := range split {
 		constraintName := strings.Split(str, "=")[0]
@@ -160,6 +111,7 @@ func parseTag(tag string) map[string]string {
 	return m
 }
 
+// reference from go encoder
 func parseFields(v interface{}) structFields {
 
 	t := reflect.ValueOf(v).Type()
@@ -183,6 +135,7 @@ func parseFields(v interface{}) structFields {
 				continue
 			}
 			visited[f.typ] = true
+			// fv := reflect.ValueOf(f)
 
 			for i := 0; i < f.typ.NumField(); i++ {
 				sf := f.typ.Field(i)
@@ -193,6 +146,7 @@ func parseFields(v interface{}) structFields {
 					}
 				}
 				tag := sf.Tag.Get("constraints")
+				// if the constraints tag is not present, skip the field validation
 				if tag == "-" {
 					continue
 				}
@@ -206,14 +160,20 @@ func parseFields(v interface{}) structFields {
 				if ft.Name() == "" && ft.Kind() == reflect.Ptr {
 					ft = ft.Elem()
 				}
+
+				var val reflect.Value
 				if !sf.Anonymous || ft.Kind() != reflect.Struct {
+					if f.inter != nil {
+						val = reflect.ValueOf(f.inter).Field(i)
+					} else {
+						val = fv.Field(i)
+					}
 					field := field{
 						name:        sf.Name,
 						typ:         ft,
 						constraints: consts,
-						value:       fv.Field(i),
+						value:       val,
 					}
-
 					fields = append(fields, field)
 					if count[f.typ] > 1 {
 						fields = append(fields, fields[len(fields)-1])
@@ -223,7 +183,7 @@ func parseFields(v interface{}) structFields {
 
 				nextCount[ft]++
 				if nextCount[ft] == 1 {
-					next = append(next, field{name: ft.Name(), index: index, typ: ft})
+					next = append(next, field{name: ft.Name(), index: index, typ: ft, inter: fv.Field(i).Interface()})
 				}
 			}
 		}
