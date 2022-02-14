@@ -19,9 +19,26 @@ func BenchmarkValidator(b *testing.B) {
 		ItemCount:   2000,
 	}
 	sv := NewStructValidator()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		if err := sv.Validate(msg); err != nil {
-			b.Errorf("Error in validation: %s", err)
-		}
+		_ = sv.Validate(msg)
 	}
+}
+
+func BenchmarkValidatorParallel(b *testing.B) {
+	msg := BenchTestStruct{
+		Name:        "BenchTest",
+		Age:         25,
+		Description: "this is bench testing",
+		Cost:        299.9,
+		ItemCount:   2000,
+	}
+	sv := NewStructValidator()
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			_ = sv.Validate(msg)
+		}
+	})
 }
