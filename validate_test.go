@@ -314,6 +314,39 @@ func TestNested(t *testing.T) {
 	}
 }
 
+type ExampleFail struct {
+	ReferenceFail
+	Summary     string      `json:"summary,omitempty" constraints:"required=true,nillable=false"`
+	Description string      `json:"description,omitempty" constraints:"required=true,nillable=false"`
+	Value       interface{} `json:"example,omitempty" constraints:"required=true,nillable=false"`
+}
+
+type ReferenceFail struct {
+	Ref            string `json:"ref" constraints:"required=true,nillable=false,min-length=10"`
+	RefDescription string `json:"ref-description" constraints:"required=true,nillable=false"`
+	RefSummary     string `json:"ref-summary" constraints:"required=true,nillable=false"`
+}
+
+func TestNestedFail(t *testing.T) {
+	msg := ExampleFail{
+		ReferenceFail: ReferenceFail{
+			Ref:            "reference",
+			RefSummary:     "ref summary",
+			RefDescription: "ref description",
+		},
+		Summary:     "summary",
+		Description: "description",
+		Value:       nil,
+	}
+
+	err := sv.Validate(msg)
+	got := err.Error()
+	want := "min-length validation failed"
+	if got != want {
+		t.Errorf("Expected: %s, got: %s", got, want)
+	}
+}
+
 /**
 Empty Struct Validation
 // TODO

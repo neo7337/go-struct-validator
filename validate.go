@@ -135,7 +135,6 @@ func parseFields(v interface{}) structFields {
 				continue
 			}
 			visited[f.typ] = true
-			// fv := reflect.ValueOf(f)
 
 			for i := 0; i < f.typ.NumField(); i++ {
 				sf := f.typ.Field(i)
@@ -146,7 +145,7 @@ func parseFields(v interface{}) structFields {
 					}
 				}
 				tag := sf.Tag.Get("constraints")
-				// if the constraints tag is not present, skip the field validation
+				// if the constraints tag is -, skip the field validation
 				if tag == "-" {
 					continue
 				}
