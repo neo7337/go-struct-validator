@@ -116,3 +116,20 @@ func pattern(val reflect.Value, typ reflect.Type, param string) error {
 	}
 	return nil
 }
+
+func enum(val reflect.Value, typ reflect.Type, param string) error {
+	flag := false
+	switch typ.Kind() {
+	case reflect.Int:
+		input := val.Interface().(int)
+		flag = checkIfEnumExists(strconv.Itoa(input), param, ",")
+	case reflect.String:
+		input := val.String()
+		flag = checkIfEnumExists(input, param, ",")
+	}
+
+	if flag == false {
+		return ErrEnums
+	}
+	return nil
+}

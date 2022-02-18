@@ -3,6 +3,7 @@ package validator
 import (
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 /**
@@ -365,4 +366,18 @@ func checkMax(val reflect.Value, typ reflect.Type, param string, isExclusive boo
 		}
 	}
 	return nil
+}
+
+func checkIfEnumExists(val string, param string, separator string) bool {
+	flag := false
+	params := strings.Split(param, separator)
+	for _, en := range params {
+		if val == en {
+			flag = true
+		}
+	}
+	if flag == false {
+		return false
+	}
+	return true
 }

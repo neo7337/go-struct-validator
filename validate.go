@@ -56,6 +56,8 @@ func NewStructValidator() *StructValidator {
 			"max-length": maxLength,
 			// regex pattern support
 			"pattern": pattern,
+			// enums support
+			"enum": enum,
 		},
 		tagName: "constraints",
 	}
@@ -102,7 +104,7 @@ func parseTag(tag string) map[string]string {
 	if tag == "" {
 		return m
 	}
-	split := strings.Split(tag, ",")
+	split := strings.Split(tag, "|")
 	for _, str := range split {
 		constraintName := strings.Split(str, "=")[0]
 		constraintValue := strings.Split(str, "=")[1]

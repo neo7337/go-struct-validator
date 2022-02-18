@@ -38,4 +38,6 @@ var (
 	ErrNotSupported = ErrMsg{errors.New("unsupported constraint on type")}
 
 	ErrMandatoryFields = ErrMsg{errors.New("mandatory fields not present")}
+
+	ErrEnums = ErrMsg{errors.New("enum validation failed")}
 )

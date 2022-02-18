@@ -378,3 +378,52 @@ func TestConstStruct(t *testing.T) {
 		t.Errorf("Error in validation: %s", err)
 	}
 }
+
+func TestEnumValidation(t *testing.T) {
+
+	testsPass := []struct {
+		Name  string
+		input interface{}
+	}{
+		{
+			Name: "Test1",
+			input: struct {
+				Status     string `json:"status" constraints:"required=true|nillable=true|enum=Success,Error,Not Reachable"`
+				StatusCode int    `json:"statusCode" constraints:"required=true|nillable=true|enum=200,404,500"`
+			}{Status: "Success", StatusCode: 200},
+		},
+	}
+
+	for _, tt := range testsPass {
+		t.Run(tt.Name, func(t *testing.T) {
+			err := sv.Validate(tt.input)
+			if err != nil {
+				t.Errorf("Error in validation: %s", err)
+			}
+		})
+	}
+
+	testsError := []struct {
+		Name  string
+		input interface{}
+		want  string
+	}{
+		{
+			Name: "Test2",
+			input: struct {
+				Status2     string `json:"status2" constraints:"required=true|nillable=true|enum=Success,Error,Not Reachable"`
+				StatusCode2 int    `json:"statusCode2" constraints:"required=true|nillable=true|enum=200,404,500"`
+			}{Status2: "Success", StatusCode2: 503},
+			want: "enum validation failed",
+		},
+	}
+
+	for _, tt := range testsError {
+		t.Run(tt.Name, func(t *testing.T) {
+			err := sv.Validate(tt.input)
+			if tt.want != err.Error() {
+				t.Errorf("Got: %s, want: %s", err, tt.want)
+			}
+		})
+	}
+}
