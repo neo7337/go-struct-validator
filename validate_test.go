@@ -29,8 +29,8 @@ func TestRequiredConstraintFail(t *testing.T) {
 }
 
 type ReqMsg2 struct {
-	Name string `json:"name" constraints:"required=true,nillable=true"`
-	Age  int    `json:"age" constraints:"required=true,nillable=true"`
+	Name string `json:"name" constraints:"required=true|nillable=true"`
+	Age  int    `json:"age" constraints:"required=true|nillable=true"`
 }
 
 func TestSuccessValidation(t *testing.T) {
@@ -56,8 +56,8 @@ func TestNumericValidations(t *testing.T) {
 		{
 			Name: "Test1",
 			input: struct {
-				MinC1 int `json:"minC1" constraints:"required=true,nillable=true,min=10"`
-				MaxC1 int `json:"maxC1" constraints:"required=true,nillable=true,max=49"`
+				MinC1 int `json:"minC1" constraints:"required=true|nillable=true|min=10"`
+				MaxC1 int `json:"maxC1" constraints:"required=true|nillable=true|max=49"`
 			}{MinC1: 12, MaxC1: 45},
 		},
 		/**
@@ -66,14 +66,14 @@ func TestNumericValidations(t *testing.T) {
 		{
 			Name: "Test4",
 			input: struct {
-				MinC4 int `json:"minC4" constraints:"required=true,nillable=true,exclusiveMin=10"`
-				MaxC4 int `json:"maxC4" constraints:"required=true,nillable=true,exclusiveMax=50"`
+				MinC4 int `json:"minC4" constraints:"required=true|nillable=true|exclusiveMin=10"`
+				MaxC4 int `json:"maxC4" constraints:"required=true|nillable=true|exclusiveMax=50"`
 			}{MinC4: 10, MaxC4: 50},
 		},
 		{
 			Name: "Test7",
 			input: struct {
-				Num7 int `json:"num7" constraints:"required=true,nillable=true,multipleOf=5"`
+				Num7 int `json:"num7" constraints:"required=true|nillable=true|multipleOf=5"`
 			}{Num7: 10},
 		},
 	}
@@ -95,16 +95,16 @@ func TestNumericValidations(t *testing.T) {
 		{
 			Name: "Test2",
 			input: struct {
-				MinC2 int `json:"minC2" constraints:"required=true,nillable=true,min=10"`
-				MaxC2 int `json:"maxC2" constraints:"required=true,nillable=true,max=49"`
+				MinC2 int `json:"minC2" constraints:"required=true|nillable=true|min=10"`
+				MaxC2 int `json:"maxC2" constraints:"required=true|nillable=true|max=49"`
 			}{MinC2: 7, MaxC2: 45},
 			want: "min value validation failed",
 		},
 		{
 			Name: "Test3",
 			input: struct {
-				MinC3 int `json:"minC3" constraints:"required=true,nillable=true,min=10"`
-				MaxC3 int `json:"maxC3" constraints:"required=true,nillable=true,max=49"`
+				MinC3 int `json:"minC3" constraints:"required=true|nillable=true|min=10"`
+				MaxC3 int `json:"maxC3" constraints:"required=true|nillable=true|max=49"`
 			}{MinC3: 12, MaxC3: 55},
 			want: "max value validation failed",
 		},
@@ -114,23 +114,23 @@ func TestNumericValidations(t *testing.T) {
 		{
 			Name: "Test5",
 			input: struct {
-				MinC5 int `json:"minC5" constraints:"required=true,nillable=true,exclusiveMin=10"`
-				MaxC5 int `json:"maxC5" constraints:"required=true,nillable=true,exclusiveMax=50"`
+				MinC5 int `json:"minC5" constraints:"required=true|nillable=true|exclusiveMin=10"`
+				MaxC5 int `json:"maxC5" constraints:"required=true|nillable=true|exclusiveMax=50"`
 			}{MinC5: 9, MaxC5: 50},
 			want: "exclusive min validation failed",
 		},
 		{
 			Name: "Test6",
 			input: struct {
-				MinC6 int `json:"minC6" constraints:"required=true,nillable=true,exclusiveMin=10"`
-				MaxC6 int `json:"maxC6" constraints:"required=true,nillable=true,exclusiveMax=50"`
+				MinC6 int `json:"minC6" constraints:"required=true|nillable=true|exclusiveMin=10"`
+				MaxC6 int `json:"maxC6" constraints:"required=true|nillable=true|exclusiveMax=50"`
 			}{MinC6: 10, MaxC6: 51},
 			want: "exclusive max validation failed",
 		},
 		{
 			Name: "Test8",
 			input: struct {
-				Num8 int `json:"num8" constraints:"required=true,nillable=true,multipleOf=5"`
+				Num8 int `json:"num8" constraints:"required=true|nillable=true|multipleOf=5"`
 			}{Num8: 11},
 			want: "multipleOf validation failed",
 		},
@@ -154,8 +154,8 @@ func TestStringValidation(t *testing.T) {
 		{
 			Name: "Test1",
 			input: struct {
-				Str1T1 string `json:"str1T1" constraints:"required=true,nillable=true,min-length=10"`
-				Str2T1 string `json:"str2T1" constraints:"required=true,nillable=true,max-length=15"`
+				Str1T1 string `json:"str1T1" constraints:"required=true|nillable=true|min-length=10"`
+				Str2T1 string `json:"str2T1" constraints:"required=true|nillable=true|max-length=15"`
 			}{Str1T1: "hello_world", Str2T1: "hello_world_go"},
 		},
 		/**
@@ -164,7 +164,7 @@ func TestStringValidation(t *testing.T) {
 		{
 			Name: "Test4",
 			input: struct {
-				Str4 string `json:"str4" constraints:"required=true,nillable=false,pattern=^[tes]{4}.*"`
+				Str4 string `json:"str4" constraints:"required=true|nillable=false|pattern=^[tes]{4}.*"`
 			}{Str4: "test1234"},
 		},
 	}
@@ -186,16 +186,16 @@ func TestStringValidation(t *testing.T) {
 		{
 			Name: "Test2",
 			input: struct {
-				Str1T2 string `json:"str1T2" constraints:"required=true,nillable=true,min-length=10"`
-				Str2T2 string `json:"str2T2" constraints:"required=true,nillable=true,max-length=15"`
+				Str1T2 string `json:"str1T2" constraints:"required=true|nillable=true|min-length=10"`
+				Str2T2 string `json:"str2T2" constraints:"required=true|nillable=true|max-length=15"`
 			}{Str1T2: "hell_worl", Str2T2: "hello_world_go"},
 			want: "min-length validation failed",
 		},
 		{
 			Name: "Test3",
 			input: struct {
-				Str1T3 string `json:"str1T3" constraints:"required=true,nillable=true,min-length=10"`
-				Str2T3 string `json:"str2T3" constraints:"required=true,nillable=true,max-length=15"`
+				Str1T3 string `json:"str1T3" constraints:"required=true|nillable=true|min-length=10"`
+				Str2T3 string `json:"str2T3" constraints:"required=true|nillable=true|max-length=15"`
 			}{Str1T3: "hello_world", Str2T3: "hello_world_from_go"},
 			want: "max-length validation failed",
 		},
@@ -205,14 +205,14 @@ func TestStringValidation(t *testing.T) {
 		{
 			Name: "Test5",
 			input: struct {
-				Str5 string `json:"str5" constraints:"required=true,nillable=false,pattern=^[tes]{4}.*"`
+				Str5 string `json:"str5" constraints:"required=true|nillable=false|pattern=^[tes]{4}.*"`
 			}{Str5: "abcd1234"},
 			want: "pattern validation failed",
 		},
 		{
 			Name: "Test6",
 			input: struct {
-				Str6 string `json:"str6" constraints:"required=true,nillable=false,pattern=["`
+				Str6 string `json:"str6" constraints:"required=true|nillable=false|pattern=["`
 			}{Str6: "tsst1234"},
 			want: "invalid constraint value",
 		},
@@ -242,7 +242,7 @@ func TestReqValidation(t *testing.T) {
 		{
 			Name: "Test1",
 			input: struct {
-				Name1 string `json:"name1" constraints:"required=true,nillable=false"`
+				Name1 string `json:"name1" constraints:"required=true|nillable=false"`
 			}{Name1: "abcd"},
 		},
 	}
@@ -263,7 +263,7 @@ func TestReqValidation(t *testing.T) {
 		{
 			Name: "Test2",
 			input: struct {
-				Name2 string `json:"name2" constraints:"required=true,nillable=false"`
+				Name2 string `json:"name2" constraints:"required=true|nillable=false"`
 			}{Name2: ""},
 			want: "required validation failed",
 		},
@@ -286,15 +286,15 @@ Nested Structure Testing
 
 type Example struct {
 	Reference
-	Summary     string      `json:"summary,omitempty" constraints:"required=true,nillable=false"`
-	Description string      `json:"description,omitempty" constraints:"required=true,nillable=false"`
-	Value       interface{} `json:"example,omitempty" constraints:"required=true,nillable=false"`
+	Summary     string      `json:"summary,omitempty" constraints:"required=true|nillable=false"`
+	Description string      `json:"description,omitempty" constraints:"required=true|nillable=false"`
+	Value       interface{} `json:"example,omitempty" constraints:"required=true|nillable=false"`
 }
 
 type Reference struct {
-	Ref            string `json:"ref" constraints:"required=true,nillable=false"`
-	RefDescription string `json:"ref-description" constraints:"required=true,nillable=false"`
-	RefSummary     string `json:"ref-summary" constraints:"required=true,nillable=false"`
+	Ref            string `json:"ref" constraints:"required=true|nillable=false"`
+	RefDescription string `json:"ref-description" constraints:"required=true|nillable=false"`
+	RefSummary     string `json:"ref-summary" constraints:"required=true|nillable=false"`
 }
 
 func TestNested(t *testing.T) {
@@ -316,15 +316,15 @@ func TestNested(t *testing.T) {
 
 type ExampleFail struct {
 	ReferenceFail
-	Summary     string      `json:"summary,omitempty" constraints:"required=true,nillable=false"`
-	Description string      `json:"description,omitempty" constraints:"required=true,nillable=false"`
-	Value       interface{} `json:"example,omitempty" constraints:"required=true,nillable=false"`
+	Summary     string      `json:"summary,omitempty" constraints:"required=true|nillable=false"`
+	Description string      `json:"description,omitempty" constraints:"required=true|nillable=false"`
+	Value       interface{} `json:"example,omitempty" constraints:"required=true|nillable=false"`
 }
 
 type ReferenceFail struct {
-	Ref            string `json:"ref" constraints:"required=true,nillable=false,min-length=10"`
-	RefDescription string `json:"ref-description" constraints:"required=true,nillable=false"`
-	RefSummary     string `json:"ref-summary" constraints:"required=true,nillable=false"`
+	Ref            string `json:"ref" constraints:"required=true|nillable=false|min-length=10"`
+	RefDescription string `json:"ref-description" constraints:"required=true|nillable=false"`
+	RefSummary     string `json:"ref-summary" constraints:"required=true|nillable=false"`
 }
 
 func TestNestedFail(t *testing.T) {
@@ -353,7 +353,7 @@ Empty Struct Validation
 */
 
 type EmptyExample struct {
-	Field string `json:"field" constraints:"required=false,nillable=false"`
+	Field string `json:"field" constraints:"required=false|nillable=false"`
 }
 
 func TestEmptyStruct(t *testing.T) {
@@ -366,7 +366,7 @@ func TestEmptyStruct(t *testing.T) {
 
 type ConstExample struct {
 	Summary     string `json:"summary" constraints:"-"`
-	Description string `json:"description" constraints:"required=false,nillable=false"`
+	Description string `json:"description" constraints:"required=false|nillable=false"`
 }
 
 func TestConstStruct(t *testing.T) {
