@@ -18,7 +18,7 @@ The validator covers the specifications, and its respective validations accordin
 ### Installation
 
 ```bash
-go get ____
+go get github.com/neo7337/go-struct-validator
 ```
 
 ### Benchmarking
@@ -51,7 +51,7 @@ To add check for validations, add the `constraints` tag in the struct fields.
     
     import (
         "fmt"
-        "github.com/neo7337/go-struct-validator/v1"
+        "github.com/neo7337/go-struct-validator"
     )
     
     var sv = validator.NewStructValidator()
