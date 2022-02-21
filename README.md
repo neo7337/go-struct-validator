@@ -10,8 +10,8 @@ The validator covers the specifications, and its respective validations accordin
 - [Benchmarking](#benchmarking)
 - [Quick Start Guide](#quick-start-guide)
 - [Features](#features)
+  - [Mandatory Validations Check](#mandatory-validations-check)
   - [Validations Supported](#validations-supported)
-- [WIP](#wip)
 
 ---
 
@@ -31,13 +31,6 @@ go test -run=Bench -bench=. -benchtime 5000000x
 |:------|:----------------------------:|---------|-------------|
 | 1     |     BenchmarkValidator-8     | 5000000 | 1288 ns/op  |
 | 1     | BenchmarkValidatorParallel-8 | 5000000 | 385 ns/op   |
-
-### WIP
-1. Base Struct Validator
-2. Enums Validation 
-3. Nested Struct Validation
-4. Benchmarking
-5. Cache Implementation
 
 ### Quick Start Guide
 
@@ -72,27 +65,36 @@ To add check for validations, add the `constraints` tag in the struct fields.
             Cost:        299.9,
             ItemCount:   2000,
         }
-        sv := NewStructValidator()
+		
         if err := sv.Validate(msg); err != nil {
             fmt.Errorf(err)
         }
     }
-
 ```
 
 ### Features
 
-#### Validations Supported
-1. required
-2. nillable
-3. default
-4. min
-5. max
-6. exclusiveMin
-7. exclusiveMax
-8. multipleOf
-9. min-length
-10. max-length
-11. pattern
-12. enum
+#### Mandatory Validations Check
 
+2 constraints are to be present with each struct contraint tag
+1. `required`
+2. `nillable`
+
+If any one of the constraint is not passed, the validation fails with the respective error.
+
+#### Validations Supported
+
+| S.No. |     Name     | Data Type Supported | Status |
+|:------|:------------:|---------------------|--------|
+| 1     |   required   | all                 | WIP    |
+| 2     |   nillable   | all                 | WIP    |
+| 3     |   default    | all                 | WIP    |
+| 4     |     min      | numeric             | ✅      |
+| 5     |     max      | numeric             | ✅      |
+| 6     | exclusiveMin | numeric             | ✅      |
+| 7     | exclusiveMax | numeric             | ✅      |
+| 8     |  multipleOf  | numeric             | ✅      |
+| 9     |  max-length  | string              | ✅      |
+| 10    |  min-length  | string              | ✅      |
+| 11    |   pattern    | string              | ✅      |
+| 12    |     enum     | all                 | ✅      |
