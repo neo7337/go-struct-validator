@@ -1,8 +1,8 @@
 package validator_test
 
 import (
+	"go-struct-validator"
 	"testing"
-	"validator"
 )
 
 var sv = validator.NewStructValidator()
