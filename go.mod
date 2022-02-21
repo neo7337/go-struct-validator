@@ -1,4 +1,4 @@
-module validator
+module go-struct-validator
 
 go 1.12
 
