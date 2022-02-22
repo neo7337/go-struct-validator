@@ -1,7 +1,7 @@
 package validator_test
 
 import (
-	"go-struct-validator"
+	"github.com/neo7337/go-struct-validator"
 	"testing"
 )
 

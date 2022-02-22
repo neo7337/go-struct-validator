@@ -1,4 +1,4 @@
-module go-struct-validator
+module github.com/neo7337/go-struct-validator
 
 go 1.12
 
