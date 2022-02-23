@@ -29,8 +29,8 @@ go test -run=Bench -bench=. -benchtime 5000000x
 
 | S.No. |             Name             | Ops     | BenchResult |
 |:------|:----------------------------:|---------|-------------|
-| 1     |     BenchmarkValidator-8     | 5000000 | 1288 ns/op  |
-| 1     | BenchmarkValidatorParallel-8 | 5000000 | 385 ns/op   |
+| 1     |     BenchmarkValidator-8     | 5000000 | 849 ns/op   |
+| 1     | BenchmarkValidatorParallel-8 | 5000000 | 268 ns/op   |
 
 ### Quick Start Guide
 

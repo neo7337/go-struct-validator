@@ -3,22 +3,32 @@ package validator
 import (
 	"go.nandlabs.io/l3"
 	"reflect"
+	"regexp"
 	"strings"
 	"sync"
 )
 
 var logger = l3.Get()
 
-var mandatory = [...]string{"required", "nillable"}
+var mapMandatory = map[string]string{
+	"required": "required",
+	"nillable": "nillable",
+}
 
 type StructValidatorFunc func(v reflect.Value, typ reflect.Type, param string) error
+
+type tStruct struct {
+	name  string
+	value string
+	fnc   StructValidatorFunc
+}
 
 type field struct {
 	name        string
 	value       reflect.Value
 	typ         reflect.Type
 	index       []int
-	constraints map[string]string
+	constraints []tStruct
 	inter       interface{}
 }
 
@@ -68,7 +78,7 @@ func (sv *StructValidator) Validate(v interface{}) error {
 	// add a logic to check for the empty struct input in order to skip the validation of the struct
 
 	//check for cache
-	sv.fields = cachedTypeFields(v)
+	sv.fields = sv.cachedTypeFields(v)
 	if err := sv.validateFields(); err != nil {
 		return err
 	}
@@ -80,8 +90,8 @@ func (sv *StructValidator) validateFields() error {
 		if err := checkForMandatory(v.constraints); err != nil {
 			return err
 		}
-		for k, val := range v.constraints {
-			if err := sv.validationFunc[k](v.value, v.typ, val); err != nil {
+		for _, val := range v.constraints {
+			if err := val.fnc(v.value, v.typ, val.value); err != nil {
 				return err
 			}
 		}
@@ -89,32 +99,57 @@ func (sv *StructValidator) validateFields() error {
 	return nil
 }
 
-func checkForMandatory(constraint map[string]string) error {
-	for _, v := range mandatory {
-		if _, ok := constraint[v]; !ok {
-			return ErrMandatoryFields
+func checkForMandatory(constraint []tStruct) error {
+	count := 0
+	for _, t := range constraint {
+		if _, ok := mapMandatory[t.name]; ok {
+			count++
 		}
+	}
+	if count != len(mapMandatory) {
+		return ErrMandatoryFields
 	}
 	return nil
 }
 
 //parseTag returns the map of constraints
-func parseTag(tag string) map[string]string {
-	m := make(map[string]string)
-	if tag == "" {
-		return m
+func (sv *StructValidator) parseTag(tag string) ([]tStruct, error) {
+	tl := splitUnescapedComma(tag)
+	t := make([]tStruct, 0, len(tl))
+
+	for _, s := range tl {
+		s = strings.Replace(s, `\,`, ",", -1)
+		tg := tStruct{}
+		v := strings.SplitN(s, "=", 2)
+		tg.name = strings.Trim(v[0], " ")
+		//check for blank tag name
+		if len(v) > 1 {
+			tg.value = strings.Trim(v[1], " ")
+		}
+		tg.fnc, _ = sv.validationFunc[tg.name]
+		// check for not found
+		t = append(t, tg)
 	}
-	split := strings.Split(tag, ";")
-	for _, str := range split {
-		constraintName := strings.Split(str, "=")[0]
-		constraintValue := strings.Split(str, "=")[1]
-		m[constraintName] = constraintValue
+
+	return t, nil
+}
+
+var sepPattern = regexp.MustCompile(`((?:^|[^\\])(?:\\\\)*);`)
+
+func splitUnescapedComma(str string) []string {
+	ret := []string{}
+	indexes := sepPattern.FindAllStringIndex(str, -1)
+	last := 0
+	for _, is := range indexes {
+		ret = append(ret, str[last:is[1]-1])
+		last = is[1]
 	}
-	return m
+	ret = append(ret, str[last:])
+	return ret
 }
 
 // reference from go encoder
-func parseFields(v interface{}) structFields {
+func (sv *StructValidator) parseFields(v interface{}) structFields {
 
 	t := reflect.ValueOf(v).Type()
 	fv := reflect.ValueOf(v)
@@ -151,7 +186,8 @@ func parseFields(v interface{}) structFields {
 				if tag == "-" {
 					continue
 				}
-				consts := parseTag(tag)
+				consts, _ := sv.parseTag(tag)
+				// add check for error
 
 				index := make([]int, len(f.index)+1)
 				copy(index, f.index)
@@ -194,11 +230,11 @@ func parseFields(v interface{}) structFields {
 
 var fieldCache sync.Map //map[reflect.Type]structFields
 
-func cachedTypeFields(v interface{}) structFields {
+func (sv *StructValidator) cachedTypeFields(v interface{}) structFields {
 	t := reflect.ValueOf(v).Type()
 	if f, ok := fieldCache.Load(t); ok {
 		return f.(structFields)
 	}
-	f, _ := fieldCache.LoadOrStore(t, parseFields(v))
+	f, _ := fieldCache.LoadOrStore(t, sv.parseFields(v))
 	return f.(structFields)
 }
