@@ -6,11 +6,11 @@ Please check out the [existing issues](https://github.com/neo7337/go-struct-vali
 
 #### 🐛 Bug Reports
 
-For reporting bugs, please create a [new issue](https://github.com/neo7337/go-struct-validator/issues/new/choose).
+For reporting bugs, please create a [new issue](https://github.com/neo7337/go-struct-validator/issues/new/choose) following the Issue Template [Bug Template](https://github.com/neo7337/go-struct-validator/blob/main/.github/ISSUE_TEMPLATE/bug_report.md).
 
 #### ✨ Feature Requests
 
-If you are missing a certain feature, please create a [new issue](https://github.com/neo7337/go-struct-validator/issues/new/choose) with label as `enhancement`.
+If you are missing a certain feature, please create a [new issue](https://github.com/neo7337/go-struct-validator/issues/new/choose) with label as `enhancement`. Please follow the Feature Request Template [Feature Template](https://github.com/neo7337/go-struct-validator/blob/main/.github/ISSUE_TEMPLATE/feature_request.md).
 
 #### 📝 Docs
 
