@@ -74,9 +74,6 @@ func NewStructValidator() *StructValidator {
 }
 
 func (sv *StructValidator) Validate(v interface{}) error {
-	//logger.Info("starting struct validation")
-	// add a logic to check for the empty struct input in order to skip the validation of the struct
-
 	//check for cache
 	sv.fields = sv.cachedTypeFields(v)
 	if err := sv.validateFields(); err != nil {
@@ -87,6 +84,11 @@ func (sv *StructValidator) Validate(v interface{}) error {
 
 func (sv *StructValidator) validateFields() error {
 	for _, v := range sv.fields.list {
+		// check if the constraints tag is present or not, skip any kind of validation for which the constraints are not passed
+		if (reflect.DeepEqual(v.constraints[0], tStruct{})) {
+			logger.InfoF("skipping validation check for field: %s", v.name)
+			continue
+		}
 		if err := checkForMandatory(v.constraints); err != nil {
 			return err
 		}
