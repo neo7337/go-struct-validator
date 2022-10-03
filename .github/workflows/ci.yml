@@ -21,10 +21,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build
-        run: go build -v ./...
+        run: make build
 
       - name: Test
-        run: go test -v ./...
+        run: make test
 
       - name: Test Coverage
-        run: go test -cover ./...
+        run: make test-cover

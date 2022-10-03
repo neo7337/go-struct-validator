@@ -8,4 +8,12 @@ clean:
 
 .PHONY: test
 test:
-	go test -cover -coverprofile=coverage.txt -covermode=atomic ./...
+	@go test -v ./...
+
+.PHONY: test-cover
+test-cover:
+	@go test -cover -coverprofile=coverage.txt -covermode=atomic ./...
+
+.PHONY: build
+build:
+	@go build -v ./...
