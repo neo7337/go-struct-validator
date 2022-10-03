@@ -28,6 +28,51 @@ func TestRequiredConstraintFail(t *testing.T) {
 	}
 }
 
+func TestSkipValidation(t *testing.T) {
+	type Msg struct {
+		Name   string `json:"name" constraints:"required=true;nillable=true;min-length=5"`
+		Age    int    `json:"age" constraints:"required=true;nillable=true;min=10"`
+		Mobile int    `json:"mobile" constraints:""`
+	}
+	tests := []struct {
+		name  string
+		input interface{}
+	}{
+		{
+			name: "Test1",
+			input: struct {
+				Name   string `json:"name" constraints:"required=true;nillable=true;min-length=5"`
+				Age    int    `json:"age" constraints:"required=true;nillable=true;min=10"`
+				Mobile int    `json:"mobile" constraints:""`
+			}{Name: "Testings", Age: 20, Mobile: 123456789},
+		},
+		{
+			name: "Test2",
+			input: struct {
+				Name   string `json:"name" constraints:"required=true;nillable=true;min-length=5"`
+				Age    int    `json:"age" constraints:""`
+				Mobile int    `json:"mobile"`
+			}{Name: "Testings", Age: 20, Mobile: 123456789},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := sv.Validate(tt.input)
+			if err != nil {
+				t.Errorf("Error in validation: %s", err)
+			}
+		})
+	}
+	//req := Msg{
+	//	Name:   "Testings",
+	//	Age:    20,
+	//	Mobile: 123456789,
+	//}
+	//if err := sv.Validate(req); err != nil {
+	//	t.Errorf("Error in validation: %s", err)
+	//}
+}
+
 type ReqMsg2 struct {
 	Name string `json:"name" constraints:"required=true;nillable=true"`
 	Age  int    `json:"age" constraints:"required=true;nillable=true"`

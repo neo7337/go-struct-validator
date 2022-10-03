@@ -14,6 +14,10 @@ test:
 test-cover:
 	@go test -cover -coverprofile=coverage.txt -covermode=atomic ./...
 
+.PHONY: test-bench
+test-bench:
+	@go test -run=Bench -bench=. -benchtime 5000000x
+
 .PHONY: build
 build:
 	@go build -v ./...
