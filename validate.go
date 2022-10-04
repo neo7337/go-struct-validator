@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"fmt"
 	"go.nandlabs.io/l3"
 	"reflect"
 	"regexp"
@@ -40,6 +41,7 @@ type StructValidator struct {
 	fields         structFields
 	validationFunc map[string]StructValidatorFunc
 	tagName        string
+	enableCache    bool
 }
 
 func NewStructValidator() *StructValidator {
@@ -69,8 +71,15 @@ func NewStructValidator() *StructValidator {
 			// enums support
 			"enum": enum,
 		},
-		tagName: "constraints",
+		tagName:     "constraints",
+		enableCache: false,
 	}
+}
+
+func NewStructValidatorWithCache() *StructValidator {
+	withCache := NewStructValidator()
+	withCache.enableCache = true
+	return withCache
 }
 
 func (sv *StructValidator) Validate(v interface{}) error {
@@ -233,10 +242,15 @@ func (sv *StructValidator) parseFields(v interface{}) structFields {
 var fieldCache sync.Map //map[reflect.Type]structFields
 
 func (sv *StructValidator) cachedTypeFields(v interface{}) structFields {
-	t := reflect.ValueOf(v).Type()
-	if f, ok := fieldCache.Load(t); ok {
+	if sv.enableCache {
+		t := reflect.ValueOf(v).Type()
+		if f, ok := fieldCache.Load(t); ok {
+			fmt.Println("return from cache")
+			return f.(structFields)
+		}
+		f, _ := fieldCache.LoadOrStore(t, sv.parseFields(v))
 		return f.(structFields)
 	}
-	f, _ := fieldCache.LoadOrStore(t, sv.parseFields(v))
-	return f.(structFields)
+	f := sv.parseFields(v)
+	return f
 }
