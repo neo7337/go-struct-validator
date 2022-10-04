@@ -1,7 +1,6 @@
 package validator
 
 import (
-	"fmt"
 	"go.nandlabs.io/l3"
 	"reflect"
 	"regexp"
@@ -245,7 +244,6 @@ func (sv *StructValidator) cachedTypeFields(v interface{}) structFields {
 	if sv.enableCache {
 		t := reflect.ValueOf(v).Type()
 		if f, ok := fieldCache.Load(t); ok {
-			fmt.Println("return from cache")
 			return f.(structFields)
 		}
 		f, _ := fieldCache.LoadOrStore(t, sv.parseFields(v))
