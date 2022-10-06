@@ -11,15 +11,15 @@ import (
 Base Constraints for all Data Types
 */
 
-func required(val reflect.Value, typ reflect.Type, param string) error {
-	switch typ.Kind() {
+func required(field field, param string) error {
+	switch field.typ.Kind() {
 	case reflect.String:
 		c, err := convertBool(param)
 		if err != nil {
 			return err
 		}
 		if c == true {
-			in, _ := val.Interface().(string)
+			in, _ := field.value.Interface().(string)
 			if in == "" {
 				return ErrRequired
 			}
@@ -32,11 +32,11 @@ func required(val reflect.Value, typ reflect.Type, param string) error {
 	return nil
 }
 
-func nillable(val reflect.Value, typ reflect.Type, param string) error {
+func nillable(field field, param string) error {
 	return nil
 }
 
-func def(val reflect.Value, typ reflect.Type, param string) error {
+func def(field field, param string) error {
 	return nil
 }
 
@@ -44,26 +44,26 @@ func def(val reflect.Value, typ reflect.Type, param string) error {
 Numerical Type Constraints
 */
 
-func min(val reflect.Value, typ reflect.Type, param string) error {
-	return checkMin(val, typ, param, false)
+func min(field field, param string) error {
+	return checkMin(field.value, field.typ, param, false)
 }
 
-func max(val reflect.Value, typ reflect.Type, param string) error {
-	return checkMax(val, typ, param, false)
+func max(field field, param string) error {
+	return checkMax(field.value, field.typ, param, false)
 }
 
-func exclusiveMin(val reflect.Value, typ reflect.Type, param string) error {
-	return checkMin(val, typ, param, true)
+func exclusiveMin(field field, param string) error {
+	return checkMin(field.value, field.typ, param, true)
 }
 
-func exclusiveMax(val reflect.Value, typ reflect.Type, param string) error {
-	return checkMax(val, typ, param, true)
+func exclusiveMax(field field, param string) error {
+	return checkMax(field.value, field.typ, param, true)
 }
 
-func multipleOf(val reflect.Value, typ reflect.Type, param string) error {
+func multipleOf(field field, param string) error {
 	// TODO : works only for int as of now
 	valid := true
-	in, _ := val.Interface().(int)
+	in, _ := field.value.Interface().(int)
 	c, err := convertInt(param, 0)
 	cInt := int(c)
 	if err != nil {
@@ -80,10 +80,10 @@ func multipleOf(val reflect.Value, typ reflect.Type, param string) error {
 String Type Constraints
 */
 
-func minLength(val reflect.Value, typ reflect.Type, param string) error {
+func minLength(field field, param string) error {
 	valid := true
 	lc, _ := strconv.Atoi(param)
-	lv := len(fmt.Sprint(val))
+	lv := len(fmt.Sprint(field.value))
 	valid = lv > lc
 	if !valid {
 		return ErrMinLength
@@ -91,10 +91,10 @@ func minLength(val reflect.Value, typ reflect.Type, param string) error {
 	return nil
 }
 
-func maxLength(val reflect.Value, typ reflect.Type, param string) error {
+func maxLength(field field, param string) error {
 	valid := true
 	lc, _ := strconv.Atoi(param)
-	lv := len(fmt.Sprint(val))
+	lv := len(fmt.Sprint(field.value))
 	valid = lv < lc
 	if !valid {
 		return ErrMaxLength
@@ -102,9 +102,9 @@ func maxLength(val reflect.Value, typ reflect.Type, param string) error {
 	return nil
 }
 
-func pattern(val reflect.Value, typ reflect.Type, param string) error {
-	in, _ := val.Interface().(string)
-	if typ.Kind() != reflect.String {
+func pattern(field field, param string) error {
+	in, _ := field.value.Interface().(string)
+	if field.value.Kind() != reflect.String {
 		return ErrNotSupported
 	}
 	re, err := regexp.Compile(param)
@@ -117,14 +117,14 @@ func pattern(val reflect.Value, typ reflect.Type, param string) error {
 	return nil
 }
 
-func enum(val reflect.Value, typ reflect.Type, param string) error {
+func enum(field field, param string) error {
 	flag := false
-	switch typ.Kind() {
+	switch field.value.Kind() {
 	case reflect.Int:
-		input := val.Interface().(int)
+		input := field.value.Interface().(int)
 		flag = checkIfEnumExists(strconv.Itoa(input), param, ",")
 	case reflect.String:
-		input := val.String()
+		input := field.value.String()
 		flag = checkIfEnumExists(input, param, ",")
 	}
 
