@@ -1,11 +1,12 @@
 package validator
 
 import (
-	"go.nandlabs.io/l3"
 	"reflect"
 	"regexp"
 	"strings"
 	"sync"
+
+	"go.nandlabs.io/l3"
 )
 
 var logger = l3.Get()
@@ -15,7 +16,7 @@ var mapMandatory = map[string]string{
 	"nillable": "nillable",
 }
 
-type StructValidatorFunc func(v reflect.Value, typ reflect.Type, param string) error
+type StructValidatorFunc func(field field, param string) error
 
 type tStruct struct {
 	name  string
@@ -91,17 +92,17 @@ func (sv *StructValidator) Validate(v interface{}) error {
 }
 
 func (sv *StructValidator) validateFields() error {
-	for _, v := range sv.fields.list {
+	for _, field := range sv.fields.list {
 		// check if the constraints tag is present or not, skip any kind of validation for which the constraints are not passed
-		if (reflect.DeepEqual(v.constraints[0], tStruct{})) {
-			logger.InfoF("skipping validation check for field: %s", v.name)
+		if (reflect.DeepEqual(field.constraints[0], tStruct{})) {
+			logger.InfoF("skipping validation check for field: %s", field.name)
 			continue
 		}
-		if err := checkForMandatory(v.constraints); err != nil {
+		if err := checkForMandatory(field.constraints); err != nil {
 			return err
 		}
-		for _, val := range v.constraints {
-			if err := val.fnc(v.value, v.typ, val.value); err != nil {
+		for _, val := range field.constraints {
+			if err := val.fnc(field, val.value); err != nil {
 				return err
 			}
 		}
@@ -122,7 +123,7 @@ func checkForMandatory(constraint []tStruct) error {
 	return nil
 }
 
-//parseTag returns the map of constraints
+// parseTag returns the map of constraints
 func (sv *StructValidator) parseTag(tag string) ([]tStruct, error) {
 	tl := splitUnescapedComma(tag)
 	t := make([]tStruct, 0, len(tl))
