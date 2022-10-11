@@ -11,11 +11,6 @@ import (
 
 var logger = l3.Get()
 
-var mapMandatory = map[string]string{
-	"required": "required",
-	"nillable": "nillable",
-}
-
 type StructValidatorFunc func(field field, param string) error
 
 type tStruct struct {
@@ -48,13 +43,6 @@ func NewStructValidator() *StructValidator {
 	return &StructValidator{
 		validationFunc: map[string]StructValidatorFunc{
 			// Base Constraints
-			// boolean value
-			// mandatory field
-			"required": required,
-			// boolean value
-			// mandatory field
-			"nillable": nillable,
-			"default":  def,
 			// Numeric Constraints
 			// <, > only
 			"min": min,
@@ -64,6 +52,8 @@ func NewStructValidator() *StructValidator {
 			"exclusiveMax": exclusiveMax,
 			"multipleOf":   multipleOf,
 			// String Constraints
+			// boolean value
+			"notnull":    notnull,
 			"min-length": minLength,
 			"max-length": maxLength,
 			// regex pattern support
@@ -98,27 +88,11 @@ func (sv *StructValidator) validateFields() error {
 			logger.InfoF("skipping validation check for field: %s", field.name)
 			continue
 		}
-		if err := checkForMandatory(field.constraints); err != nil {
-			return err
-		}
 		for _, val := range field.constraints {
 			if err := val.fnc(field, val.value); err != nil {
 				return err
 			}
 		}
-	}
-	return nil
-}
-
-func checkForMandatory(constraint []tStruct) error {
-	count := 0
-	for _, t := range constraint {
-		if _, ok := mapMandatory[t.name]; ok {
-			count++
-		}
-	}
-	if count != len(mapMandatory) {
-		return ErrMandatoryFields
 	}
 	return nil
 }
