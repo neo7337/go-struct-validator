@@ -7,44 +7,23 @@ import (
 
 var sv = validator.NewStructValidator()
 
-/**
-mandatory constraint validations test
-*/
-type ReqMsg struct {
-	Name string `json:"name" constraints:"min-length=5"`
-	Age  int    `json:"age" constraints:"min=10"`
-}
-
-func TestRequiredConstraintFail(t *testing.T) {
-	msg := ReqMsg{
-		Name: "Test",
-		Age:  11,
-	}
-	err := sv.Validate(msg)
-	got := err.Error()
-	want := "mandatory fields not present"
-	if got != want {
-		t.Errorf("Expected: %s, got: %s", got, want)
-	}
-}
-
 func TestSkipValidation(t *testing.T) {
 	tests := []struct {
 		name  string
 		input interface{}
 	}{
 		{
-			name: "Test1",
+			name: "Test-pass-1",
 			input: struct {
-				Name   string `json:"name" constraints:"required=true;nillable=true;min-length=5"`
-				Age    int    `json:"age" constraints:"required=true;nillable=true;min=10"`
+				Name   string `json:"name" constraints:"min-length=5"`
+				Age    int    `json:"age" constraints:"min=10"`
 				Mobile int    `json:"mobile" constraints:""`
 			}{Name: "Testings", Age: 20, Mobile: 123456789},
 		},
 		{
-			name: "Test2",
+			name: "Test-pass-2",
 			input: struct {
-				Name   string `json:"name" constraints:"required=true;nillable=true;min-length=5"`
+				Name   string `json:"name" constraints:"min-length=5"`
 				Age    int    `json:"age" constraints:""`
 				Mobile int    `json:"mobile"`
 			}{Name: "Testings", Age: 20, Mobile: 123456789},
@@ -60,13 +39,13 @@ func TestSkipValidation(t *testing.T) {
 	}
 }
 
-type ReqMsg2 struct {
-	Name string `json:"name" constraints:"required=true;nillable=true"`
-	Age  int    `json:"age" constraints:"required=true;nillable=true"`
-}
-
 func TestSuccessValidation(t *testing.T) {
-	msg := ReqMsg2{
+	type ReqMsg struct {
+		Name string `json:"name" constraints:"notnull=true"`
+		Age  int    `json:"age" constraints:"min=0"`
+	}
+
+	msg := ReqMsg{
 		Name: "Test",
 		Age:  11,
 	}
@@ -86,26 +65,26 @@ func TestNumericValidations(t *testing.T) {
 		input interface{}
 	}{
 		{
-			Name: "Test1",
+			Name: "Test-pass-1",
 			input: struct {
-				MinC1 int `json:"minC1" constraints:"required=true;nillable=true;min=10"`
-				MaxC1 int `json:"maxC1" constraints:"required=true;nillable=true;max=49"`
+				MinC1 int `json:"minC1" constraints:"min=10"`
+				MaxC1 int `json:"maxC1" constraints:"max=49"`
 			}{MinC1: 12, MaxC1: 45},
 		},
 		/**
 		exclusive min/max validation test
 		*/
 		{
-			Name: "Test4",
+			Name: "Test-pass-2",
 			input: struct {
-				MinC4 int `json:"minC4" constraints:"required=true;nillable=true;exclusiveMin=10"`
-				MaxC4 int `json:"maxC4" constraints:"required=true;nillable=true;exclusiveMax=50"`
+				MinC4 int `json:"minC4" constraints:"exclusiveMin=10"`
+				MaxC4 int `json:"maxC4" constraints:"exclusiveMax=50"`
 			}{MinC4: 10, MaxC4: 50},
 		},
 		{
-			Name: "Test7",
+			Name: "Test-pass-3",
 			input: struct {
-				Num7 int `json:"num7" constraints:"required=true;nillable=true;multipleOf=5"`
+				Num7 int `json:"num7" constraints:"multipleOf=5"`
 			}{Num7: 10},
 		},
 	}
@@ -125,18 +104,18 @@ func TestNumericValidations(t *testing.T) {
 		want  string
 	}{
 		{
-			Name: "Test2",
+			Name: "Test-fail-1",
 			input: struct {
-				MinC2 int `json:"minC2" constraints:"required=true;nillable=true;min=10"`
-				MaxC2 int `json:"maxC2" constraints:"required=true;nillable=true;max=49"`
+				MinC2 int `json:"minC2" constraints:"min=10"`
+				MaxC2 int `json:"maxC2" constraints:"max=49"`
 			}{MinC2: 7, MaxC2: 45},
 			want: "min value validation failed",
 		},
 		{
-			Name: "Test3",
+			Name: "Test-fail-2",
 			input: struct {
-				MinC3 int `json:"minC3" constraints:"required=true;nillable=true;min=10"`
-				MaxC3 int `json:"maxC3" constraints:"required=true;nillable=true;max=49"`
+				MinC3 int `json:"minC3" constraints:"min=10"`
+				MaxC3 int `json:"maxC3" constraints:"max=49"`
 			}{MinC3: 12, MaxC3: 55},
 			want: "max value validation failed",
 		},
@@ -144,27 +123,62 @@ func TestNumericValidations(t *testing.T) {
 		exclusive min/max validation test
 		*/
 		{
-			Name: "Test5",
+			Name: "Test-fail-3",
 			input: struct {
-				MinC5 int `json:"minC5" constraints:"required=true;nillable=true;exclusiveMin=10"`
-				MaxC5 int `json:"maxC5" constraints:"required=true;nillable=true;exclusiveMax=50"`
+				MinC5 int `json:"minC5" constraints:"exclusiveMin=10"`
+				MaxC5 int `json:"maxC5" constraints:"exclusiveMax=50"`
 			}{MinC5: 9, MaxC5: 50},
 			want: "exclusive min validation failed",
 		},
 		{
-			Name: "Test6",
+			Name: "Test-fail-4",
 			input: struct {
-				MinC6 int `json:"minC6" constraints:"required=true;nillable=true;exclusiveMin=10"`
-				MaxC6 int `json:"maxC6" constraints:"required=true;nillable=true;exclusiveMax=50"`
+				MinC6 int `json:"minC6" constraints:"exclusiveMin=10"`
+				MaxC6 int `json:"maxC6" constraints:"exclusiveMax=50"`
 			}{MinC6: 10, MaxC6: 51},
 			want: "exclusive max validation failed",
 		},
 		{
-			Name: "Test8",
+			Name: "Test-fail-5",
 			input: struct {
-				Num8 int `json:"num8" constraints:"required=true;nillable=true;multipleOf=5"`
+				Num8 int `json:"num8" constraints:"multipleOf=5"`
 			}{Num8: 11},
 			want: "multipleOf validation failed",
+		},
+		{
+			Name: "Test-fail-6",
+			input: struct {
+				Name string `json:"name" constraints:"min=5"`
+			}{Name: "hello_world"},
+			want: "invalid validation applied to the field",
+		},
+		{
+			Name: "Test-fail-7",
+			input: struct {
+				Name string `json:"name" constraints:"max=5"`
+			}{Name: "hello_world"},
+			want: "invalid validation applied to the field",
+		},
+		{
+			Name: "Test-fail-8",
+			input: struct {
+				Name string `json:"name" constraints:"exclusiveMin=5"`
+			}{Name: "hello_world"},
+			want: "invalid validation applied to the field",
+		},
+		{
+			Name: "Test-fail-9",
+			input: struct {
+				Name string `json:"name" constraints:"exclusiveMax=5"`
+			}{Name: "hello_world"},
+			want: "invalid validation applied to the field",
+		},
+		{
+			Name: "Test-fail-10",
+			input: struct {
+				Name string `json:"name" constraints:"multipleOf=5"`
+			}{Name: "hello_world"},
+			want: "invalid validation applied to the field",
 		},
 	}
 
@@ -184,25 +198,31 @@ func TestStringValidation(t *testing.T) {
 		input interface{}
 	}{
 		{
-			Name: "Test1",
+			Name: "Test-pass-1",
 			input: struct {
-				Str1T1 string `json:"str1T1" constraints:"required=true;nillable=true;min-length=10"`
-				Str2T1 string `json:"str2T1" constraints:"required=true;nillable=true;max-length=15"`
+				Name string `json:"name" constraints:"notnull=true"`
+			}{Name: "testing"},
+		},
+		{
+			Name: "Test-pass-2",
+			input: struct {
+				Str1T1 string `json:"str1T1" constraints:"min-length=10"`
+				Str2T1 string `json:"str2T1" constraints:"max-length=15"`
 			}{Str1T1: "hello_world", Str2T1: "hello_world_go"},
 		},
 		/**
 		pattern validations
 		*/
 		{
-			Name: "Test4",
+			Name: "Test-pass-3",
 			input: struct {
-				Str4 string `json:"str4" constraints:"required=true;nillable=false;pattern=^[tes]{4}.*"`
+				Str4 string `json:"str4" constraints:"pattern=^[tes]{4}.*"`
 			}{Str4: "test1234"},
 		},
 		{
-			Name: "Test7",
+			Name: "Test-pass-4",
 			input: struct {
-				Str4 string `json:"str4" constraints:"required=true;nillable=false;pattern=gray|grey"`
+				Str4 string `json:"str4" constraints:"pattern=gray|grey"`
 			}{Str4: "grey"},
 		},
 	}
@@ -222,18 +242,18 @@ func TestStringValidation(t *testing.T) {
 		want  string
 	}{
 		{
-			Name: "Test2",
+			Name: "Test-fail-1",
 			input: struct {
-				Str1T2 string `json:"str1T2" constraints:"required=true;nillable=true;min-length=10"`
-				Str2T2 string `json:"str2T2" constraints:"required=true;nillable=true;max-length=15"`
+				Str1T2 string `json:"str1T2" constraints:"min-length=10"`
+				Str2T2 string `json:"str2T2" constraints:"max-length=15"`
 			}{Str1T2: "hell_worl", Str2T2: "hello_world_go"},
 			want: "min-length validation failed",
 		},
 		{
-			Name: "Test3",
+			Name: "Test-fail-2",
 			input: struct {
-				Str1T3 string `json:"str1T3" constraints:"required=true;nillable=true;min-length=10"`
-				Str2T3 string `json:"str2T3" constraints:"required=true;nillable=true;max-length=15"`
+				Str1T3 string `json:"str1T3" constraints:"min-length=10"`
+				Str2T3 string `json:"str2T3" constraints:"max-length=15"`
 			}{Str1T3: "hello_world", Str2T3: "hello_world_from_go"},
 			want: "max-length validation failed",
 		},
@@ -241,75 +261,67 @@ func TestStringValidation(t *testing.T) {
 		pattern validations
 		*/
 		{
-			Name: "Test5",
+			Name: "Test-fail-3",
 			input: struct {
-				Str5 string `json:"str5" constraints:"required=true;nillable=false;pattern=^[tes]{4}.*"`
+				Str5 string `json:"str5" constraints:"pattern=^[tes]{4}.*"`
 			}{Str5: "abcd1234"},
 			want: "pattern validation failed",
 		},
 		{
-			Name: "Test6",
+			Name: "Test-fail-4",
 			input: struct {
-				Str6 string `json:"str6" constraints:"required=true;nillable=false;pattern=["`
+				Str6 string `json:"str6" constraints:"pattern=["`
 			}{Str6: "tsst1234"},
 			want: "invalid constraint value",
 		},
 		{
-			Name: "Test8",
+			Name: "Test-fail-5",
 			input: struct {
-				Str string `json:"str" constraints:"required=true;nillable=false;pattern=gray|grey"`
+				Str string `json:"str" constraints:"pattern=gray|grey"`
 			}{Str: "gry"},
 			want: "pattern validation failed",
 		},
-	}
-
-	for _, tt := range testsFail {
-		t.Run(tt.Name, func(t *testing.T) {
-			err := sv.Validate(tt.input)
-			if tt.want != err.Error() {
-				t.Errorf("Got: %s, want: %s", err, tt.want)
-			}
-		})
-	}
-}
-
-/**
-required validations test
-*/
-
-func TestReqValidation(t *testing.T) {
-
-	testsPass := []struct {
-		Name  string
-		input interface{}
-	}{
 		{
-			Name: "Test1",
+			Name: "Test-fail-6",
 			input: struct {
-				Name1 string `json:"name1" constraints:"required=true;nillable=false"`
-			}{Name1: "abcd"},
+				Name string `json:"name" constraints:"notnull=true"`
+			}{Name: ""},
+			want: "notnull validation failed",
 		},
-	}
-	for _, tt := range testsPass {
-		t.Run(tt.Name, func(t *testing.T) {
-			err := sv.Validate(tt.input)
-			if err != nil {
-				t.Errorf("Error in validation: %s", err)
-			}
-		})
-	}
-
-	testsFail := []struct {
-		Name  string
-		input interface{}
-		want  string
-	}{
 		{
-			Name: "Test2",
+			Name: "Test-fail-7",
 			input: struct {
-				Name2 string `json:"name2" constraints:"required=true;nillable=false"`
-			}{Name2: ""},
-			want: "required validation failed",
+				Name string `json:"name" constraints:"notnull=dummy"`
+			}{Name: ""},
+			want: "invalid constraint value",
+		},
+		{
+			Name: "Test-fail-8",
+			input: struct {
+				Age int `json:"name" constraints:"notnull=dummy"`
+			}{Age: 22},
+			want: "invalid validation applied to the field",
+		},
+		{
+			Name: "Test-fail-9",
+			input: struct {
+				Age int `json:"name" constraints:"min-length=5"`
+			}{Age: 22},
+			want: "invalid validation applied to the field",
+		},
+		{
+			Name: "Test-fail-10",
+			input: struct {
+				Age int `json:"name" constraints:"max-length=14"`
+			}{Age: 22},
+			want: "invalid validation applied to the field",
+		},
+		{
+			Name: "Test-fail-11",
+			input: struct {
+				Age int `json:"name" constraints:"pattern=["`
+			}{Age: 22},
+			want: "invalid validation applied to the field",
 		},
 	}
 
@@ -330,15 +342,15 @@ Nested Structure Testing
 
 type Example struct {
 	Reference
-	Summary     string      `json:"summary,omitempty" constraints:"required=true;nillable=false"`
-	Description string      `json:"description,omitempty" constraints:"required=true;nillable=false"`
-	Value       interface{} `json:"example,omitempty" constraints:"required=true;nillable=false"`
+	Summary     string      `json:"summary,omitempty" constraints:""`
+	Description string      `json:"description,omitempty" constraints:""`
+	Value       interface{} `json:"example,omitempty" constraints:""`
 }
 
 type Reference struct {
-	Ref            string `json:"ref" constraints:"required=true;nillable=false"`
-	RefDescription string `json:"ref-description" constraints:"required=true;nillable=false"`
-	RefSummary     string `json:"ref-summary" constraints:"required=true;nillable=false"`
+	Ref            string `json:"ref" constraints:""`
+	RefDescription string `json:"ref-description" constraints:""`
+	RefSummary     string `json:"ref-summary" constraints:""`
 }
 
 func TestNested(t *testing.T) {
@@ -360,15 +372,15 @@ func TestNested(t *testing.T) {
 
 type ExampleFail struct {
 	ReferenceFail
-	Summary     string      `json:"summary,omitempty" constraints:"required=true;nillable=false"`
-	Description string      `json:"description,omitempty" constraints:"required=true;nillable=false"`
-	Value       interface{} `json:"example,omitempty" constraints:"required=true;nillable=false"`
+	Summary     string      `json:"summary,omitempty" constraints:""`
+	Description string      `json:"description,omitempty" constraints:""`
+	Value       interface{} `json:"example,omitempty" constraints:""`
 }
 
 type ReferenceFail struct {
-	Ref            string `json:"ref" constraints:"required=true;nillable=false;min-length=10"`
-	RefDescription string `json:"ref-description" constraints:"required=true;nillable=false"`
-	RefSummary     string `json:"ref-summary" constraints:"required=true;nillable=false"`
+	Ref            string `json:"ref" constraints:"min-length=10"`
+	RefDescription string `json:"ref-description" constraints:""`
+	RefSummary     string `json:"ref-summary" constraints:""`
 }
 
 func TestNestedFail(t *testing.T) {
@@ -393,14 +405,11 @@ func TestNestedFail(t *testing.T) {
 
 /**
 Empty Struct Validation
-// TODO
 */
-
-type EmptyExample struct {
-	Field string `json:"field" constraints:"required=false;nillable=false"`
-}
-
 func TestEmptyStruct(t *testing.T) {
+	type EmptyExample struct {
+		Field string `json:"field" constraints:""`
+	}
 	msg := EmptyExample{}
 	if err := sv.Validate(msg); err != nil {
 		t.Errorf("Error in validation: %s", err)
@@ -408,12 +417,11 @@ func TestEmptyStruct(t *testing.T) {
 
 }
 
-type ConstExample struct {
-	Summary     string `json:"summary" constraints:"-"`
-	Description string `json:"description" constraints:"required=false;nillable=false"`
-}
-
 func TestConstStruct(t *testing.T) {
+	type ConstExample struct {
+		Summary     string `json:"summary" constraints:"-"`
+		Description string `json:"description" constraints:""`
+	}
 	msg := ConstExample{
 		Summary:     "testing",
 		Description: "this is testing",
@@ -424,16 +432,15 @@ func TestConstStruct(t *testing.T) {
 }
 
 func TestEnumValidation(t *testing.T) {
-
 	testsPass := []struct {
 		Name  string
 		input interface{}
 	}{
 		{
-			Name: "Test1",
+			Name: "Test-pass-1",
 			input: struct {
-				Status     string `json:"status" constraints:"required=true;nillable=true;enum=Success,Error,Not Reachable"`
-				StatusCode int    `json:"statusCode" constraints:"required=true;nillable=true;enum=200,404,500"`
+				Status     string `json:"status" constraints:"enum=Success,Error,Not Reachable"`
+				StatusCode int    `json:"statusCode" constraints:"enum=200,404,500"`
 			}{Status: "Success", StatusCode: 200},
 		},
 	}
@@ -453,10 +460,10 @@ func TestEnumValidation(t *testing.T) {
 		want  string
 	}{
 		{
-			Name: "Test2",
+			Name: "Test-fail-2",
 			input: struct {
-				Status2     string `json:"status2" constraints:"required=true;nillable=true;enum=Success,Error,Not Reachable"`
-				StatusCode2 int    `json:"statusCode2" constraints:"required=true;nillable=true;enum=200,404,500"`
+				Status2     string `json:"status2" constraints:"enum=Success,Error,Not Reachable"`
+				StatusCode2 int    `json:"statusCode2" constraints:"enum=200,404,500"`
 			}{Status2: "Success", StatusCode2: 503},
 			want: "enum validation failed",
 		},
@@ -481,18 +488,18 @@ func TestCacheSuccess(t *testing.T) {
 		input interface{}
 	}{
 		{
-			Name: "Test1",
+			Name: "Test-pass-1",
 			input: struct {
-				Name   string `json:"name" constraints:"required=true;nillable=true;min-length=5"`
-				Age    int    `json:"age" constraints:"required=true;nillable=true;min=10"`
+				Name   string `json:"name" constraints:"min-length=5"`
+				Age    int    `json:"age" constraints:"min=10"`
 				Mobile int    `json:"mobile" constraints:""`
 			}{Name: "Testings", Age: 20, Mobile: 123456789},
 		},
 		{
-			Name: "Test2",
+			Name: "Test-pass-2",
 			input: struct {
-				Name   string `json:"name" constraints:"required=true;nillable=true;min-length=5"`
-				Age    int    `json:"age" constraints:"required=true;nillable=true;min=10"`
+				Name   string `json:"name" constraints:"min-length=5"`
+				Age    int    `json:"age" constraints:"min=10"`
 				Mobile int    `json:"mobile" constraints:""`
 			}{Name: "Testings", Age: 5, Mobile: 123456789},
 		},
@@ -517,19 +524,19 @@ func TestCacheErrs(t *testing.T) {
 		want  interface{}
 	}{
 		{
-			Name: "Test1",
+			Name: "Test-fail-1",
 			input: struct {
-				Name   string `json:"name" constraints:"required=true;nillable=true;min-length=5"`
-				Age    int    `json:"age" constraints:"required=true;nillable=true;min=10"`
+				Name   string `json:"name" constraints:"min-length=5"`
+				Age    int    `json:"age" constraints:"min=10"`
 				Mobile int    `json:"mobile" constraints:""`
 			}{Name: "Testings", Age: 20, Mobile: 123456789},
 			want: nil,
 		},
 		{
-			Name: "Test2",
+			Name: "Test-fail-2",
 			input: struct {
-				Name   string `json:"name" constraints:"required=true;nillable=true;min-length=5"`
-				Age    int    `json:"age" constraints:"required=true;nillable=true;min=10"`
+				Name   string `json:"name" constraints:"min-length=5"`
+				Age    int    `json:"age" constraints:"min=10"`
 				Mobile int    `json:"mobile" constraints:""`
 			}{Name: "Testings", Age: 5, Mobile: 123456789},
 			want: "min value validation failed",

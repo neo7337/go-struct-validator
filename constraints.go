@@ -8,39 +8,6 @@ import (
 )
 
 /**
-Base Constraints for all Data Types
-*/
-
-func required(field field, param string) error {
-	switch field.typ.Kind() {
-	case reflect.String:
-		c, err := convertBool(param)
-		if err != nil {
-			return err
-		}
-		if c == true {
-			in, _ := field.value.Interface().(string)
-			if in == "" {
-				return ErrRequired
-			}
-		}
-	case reflect.Bool:
-	case reflect.Int:
-	case reflect.Float32:
-	case reflect.Uint:
-	}
-	return nil
-}
-
-func nillable(field field, param string) error {
-	return nil
-}
-
-func def(field field, param string) error {
-	return nil
-}
-
-/**
 Numerical Type Constraints
 */
 
@@ -62,16 +29,20 @@ func exclusiveMax(field field, param string) error {
 
 func multipleOf(field field, param string) error {
 	// TODO : works only for int as of now
-	valid := true
-	in, _ := field.value.Interface().(int)
-	c, err := convertInt(param, 0)
-	cInt := int(c)
-	if err != nil {
-		return err
-	}
-	valid = in%cInt == 0
-	if !valid {
-		return ErrMultipleOf
+	switch field.typ.Kind() {
+	case reflect.Int:
+		in, _ := field.value.Interface().(int)
+		c, err := convertInt(param, 0)
+		cInt := int(c)
+		if err != nil {
+			return err
+		}
+		valid := in%cInt == 0
+		if !valid {
+			return ErrMultipleOf
+		}
+	default:
+		return ErrInvalidValidationForField
 	}
 	return nil
 }
@@ -80,39 +51,68 @@ func multipleOf(field field, param string) error {
 String Type Constraints
 */
 
+func notnull(field field, param string) error {
+	switch field.typ.Kind() {
+	case reflect.String:
+		c, err := convertBool(param)
+		if err != nil {
+			return err
+		}
+		if c == true {
+			in, _ := field.value.Interface().(string)
+			if in == "" {
+				return ErrNoNull
+			}
+		}
+	default:
+		return ErrInvalidValidationForField
+	}
+	return nil
+}
+
 func minLength(field field, param string) error {
-	valid := true
-	lc, _ := strconv.Atoi(param)
-	lv := len(fmt.Sprint(field.value))
-	valid = lv > lc
-	if !valid {
-		return ErrMinLength
+	switch field.typ.Kind() {
+	case reflect.String:
+		lc, _ := strconv.Atoi(param)
+		lv := len(fmt.Sprint(field.value))
+		valid := lv > lc
+		if !valid {
+			return ErrMinLength
+		}
+	default:
+		return ErrInvalidValidationForField
 	}
 	return nil
 }
 
 func maxLength(field field, param string) error {
-	valid := true
-	lc, _ := strconv.Atoi(param)
-	lv := len(fmt.Sprint(field.value))
-	valid = lv < lc
-	if !valid {
-		return ErrMaxLength
+	switch field.typ.Kind() {
+	case reflect.String:
+		lc, _ := strconv.Atoi(param)
+		lv := len(fmt.Sprint(field.value))
+		valid := lv < lc
+		if !valid {
+			return ErrMaxLength
+		}
+	default:
+		return ErrInvalidValidationForField
 	}
 	return nil
 }
 
 func pattern(field field, param string) error {
-	in, _ := field.value.Interface().(string)
-	if field.value.Kind() != reflect.String {
-		return ErrNotSupported
-	}
-	re, err := regexp.Compile(param)
-	if err != nil {
-		return ErrBadConstraint
-	}
-	if !re.MatchString(in) {
-		return ErrPattern
+	switch field.typ.Kind() {
+	case reflect.String:
+		in, _ := field.value.Interface().(string)
+		re, err := regexp.Compile(param)
+		if err != nil {
+			return ErrBadConstraint
+		}
+		if !re.MatchString(in) {
+			return ErrPattern
+		}
+	default:
+		return ErrInvalidValidationForField
 	}
 	return nil
 }

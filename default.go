@@ -11,11 +11,9 @@ func (e ErrMsg) Error() string {
 }
 
 var (
-	ErrRequired = ErrMsg{errors.New("required validation failed")}
+	ErrNoNull = ErrMsg{errors.New("notnull validation failed")}
 
-	ErrNillable = ErrMsg{errors.New("nillable validation failed")}
-
-	ErrDefault = ErrMsg{errors.New("default validation failed")}
+	ErrInvalidValidationForField = ErrMsg{errors.New("invalid validation applied to the field")}
 
 	ErrMin = ErrMsg{errors.New("min value validation failed")}
 
@@ -36,8 +34,6 @@ var (
 	ErrBadConstraint = ErrMsg{errors.New("invalid constraint value")}
 
 	ErrNotSupported = ErrMsg{errors.New("unsupported constraint on type")}
-
-	ErrMandatoryFields = ErrMsg{errors.New("mandatory fields not present")}
 
 	ErrEnums = ErrMsg{errors.New("enum validation failed")}
 )

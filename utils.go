@@ -194,6 +194,8 @@ func checkMin(val reflect.Value, typ reflect.Type, param string, isExclusive boo
 		} else {
 			valid = in > cFloat
 		}
+	default:
+		return ErrInvalidValidationForField
 	}
 	if !valid {
 		if isExclusive {
@@ -357,6 +359,8 @@ func checkMax(val reflect.Value, typ reflect.Type, param string, isExclusive boo
 		} else {
 			valid = in < cFloat
 		}
+	default:
+		return ErrInvalidValidationForField
 	}
 	if !valid {
 		if isExclusive {
