@@ -12,7 +12,6 @@ The validator covers the specifications, and its respective validations accordin
 - [Benchmarking](#benchmarking)
 - [Quick Start Guide](#quick-start-guide)
 - [Features](#features)
-  - [Mandatory Validations Check](#mandatory-validations-check)
   - [Validations Supported](#validations-supported)
 
 ---
@@ -76,21 +75,10 @@ To add check for validations, add the `constraints` tag in the struct fields.
 
 ### Features
 
-#### Mandatory Validations Check
-
-2 constraints are to be present with each struct contraint tag
-1. `required`
-2. `nillable`
-
-If any one of the constraint is not passed, the validation fails with the respective error.
-
 #### Validations Supported
 
 | S.No. |     Name     | Data Type Supported | Status |
 |:------|:------------:|---------------------|--------|
-| 1     |   required   | all                 | WIP    |
-| 2     |   nillable   | all                 | WIP    |
-| 3     |   default    | all                 | WIP    |
 | 4     |     min      | numeric             | ✅      |
 | 5     |     max      | numeric             | ✅      |
 | 6     | exclusiveMin | numeric             | ✅      |
@@ -99,4 +87,5 @@ If any one of the constraint is not passed, the validation fails with the respec
 | 9     |  max-length  | string              | ✅      |
 | 10    |  min-length  | string              | ✅      |
 | 11    |   pattern    | string              | ✅      |
+| 11    |   notnull    | string              | ✅      |
 | 12    |     enum     | all                 | ✅      |
