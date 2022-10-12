@@ -56,7 +56,7 @@ func notnull(field field, param string) error {
 	case reflect.String:
 		c, err := convertBool(param)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "notnull", param, field.name)
 		}
 		if c == true {
 			in, _ := field.value.Interface().(string)
@@ -106,7 +106,7 @@ func pattern(field field, param string) error {
 		in, _ := field.value.Interface().(string)
 		re, err := regexp.Compile(param)
 		if err != nil {
-			return ErrBadConstraint
+			return fmt.Errorf(ErrBadConstraint, "pattern", param, field.name)
 		}
 		if !re.MatchString(in) {
 			return fmt.Errorf(ErrPattern, field.name)
