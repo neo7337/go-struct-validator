@@ -12,19 +12,19 @@ Numerical Type Constraints
 */
 
 func min(field field, param string) error {
-	return checkMin(field.value, field.typ, param, false)
+	return checkMin(field, param, false)
 }
 
 func max(field field, param string) error {
-	return checkMax(field.value, field.typ, param, false)
+	return checkMax(field, param, false)
 }
 
 func exclusiveMin(field field, param string) error {
-	return checkMin(field.value, field.typ, param, true)
+	return checkMin(field, param, true)
 }
 
 func exclusiveMax(field field, param string) error {
-	return checkMax(field.value, field.typ, param, true)
+	return checkMax(field, param, true)
 }
 
 func multipleOf(field field, param string) error {
@@ -42,7 +42,7 @@ func multipleOf(field field, param string) error {
 			return ErrMultipleOf
 		}
 	default:
-		return ErrInvalidValidationForField
+		return fmt.Errorf(ErrInvalidValidationForField, field.name)
 	}
 	return nil
 }
@@ -61,11 +61,11 @@ func notnull(field field, param string) error {
 		if c == true {
 			in, _ := field.value.Interface().(string)
 			if in == "" {
-				return ErrNoNull
+				return fmt.Errorf(ErrNotNull, field.name)
 			}
 		}
 	default:
-		return ErrInvalidValidationForField
+		return fmt.Errorf(ErrInvalidValidationForField, field.name)
 	}
 	return nil
 }
@@ -80,7 +80,7 @@ func minLength(field field, param string) error {
 			return ErrMinLength
 		}
 	default:
-		return ErrInvalidValidationForField
+		return fmt.Errorf(ErrInvalidValidationForField, field.name)
 	}
 	return nil
 }
@@ -95,7 +95,7 @@ func maxLength(field field, param string) error {
 			return ErrMaxLength
 		}
 	default:
-		return ErrInvalidValidationForField
+		return fmt.Errorf(ErrInvalidValidationForField, field.name)
 	}
 	return nil
 }
@@ -112,7 +112,7 @@ func pattern(field field, param string) error {
 			return ErrPattern
 		}
 	default:
-		return ErrInvalidValidationForField
+		return fmt.Errorf(ErrInvalidValidationForField, field.name)
 	}
 	return nil
 }

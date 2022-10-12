@@ -1,8 +1,9 @@
 package validator_test
 
 import (
-	"github.com/neo7337/go-struct-validator"
 	"testing"
+
+	validator "github.com/neo7337/go-struct-validator"
 )
 
 var sv = validator.NewStructValidator()
@@ -150,35 +151,35 @@ func TestNumericValidations(t *testing.T) {
 			input: struct {
 				Name string `json:"name" constraints:"min=5"`
 			}{Name: "hello_world"},
-			want: "invalid validation applied to the field",
+			want: "invalid validation applied to the field Name",
 		},
 		{
 			Name: "Test-fail-7",
 			input: struct {
 				Name string `json:"name" constraints:"max=5"`
 			}{Name: "hello_world"},
-			want: "invalid validation applied to the field",
+			want: "invalid validation applied to the field Name",
 		},
 		{
 			Name: "Test-fail-8",
 			input: struct {
 				Name string `json:"name" constraints:"exclusiveMin=5"`
 			}{Name: "hello_world"},
-			want: "invalid validation applied to the field",
+			want: "invalid validation applied to the field Name",
 		},
 		{
 			Name: "Test-fail-9",
 			input: struct {
 				Name string `json:"name" constraints:"exclusiveMax=5"`
 			}{Name: "hello_world"},
-			want: "invalid validation applied to the field",
+			want: "invalid validation applied to the field Name",
 		},
 		{
 			Name: "Test-fail-10",
 			input: struct {
 				Name string `json:"name" constraints:"multipleOf=5"`
 			}{Name: "hello_world"},
-			want: "invalid validation applied to the field",
+			want: "invalid validation applied to the field Name",
 		},
 	}
 
@@ -286,7 +287,7 @@ func TestStringValidation(t *testing.T) {
 			input: struct {
 				Name string `json:"name" constraints:"notnull=true"`
 			}{Name: ""},
-			want: "notnull validation failed",
+			want: "notnull validation failed for field Name",
 		},
 		{
 			Name: "Test-fail-7",
@@ -300,28 +301,28 @@ func TestStringValidation(t *testing.T) {
 			input: struct {
 				Age int `json:"name" constraints:"notnull=dummy"`
 			}{Age: 22},
-			want: "invalid validation applied to the field",
+			want: "invalid validation applied to the field Age",
 		},
 		{
 			Name: "Test-fail-9",
 			input: struct {
 				Age int `json:"name" constraints:"min-length=5"`
 			}{Age: 22},
-			want: "invalid validation applied to the field",
+			want: "invalid validation applied to the field Age",
 		},
 		{
 			Name: "Test-fail-10",
 			input: struct {
 				Age int `json:"name" constraints:"max-length=14"`
 			}{Age: 22},
-			want: "invalid validation applied to the field",
+			want: "invalid validation applied to the field Age",
 		},
 		{
 			Name: "Test-fail-11",
 			input: struct {
 				Age int `json:"name" constraints:"pattern=["`
 			}{Age: 22},
-			want: "invalid validation applied to the field",
+			want: "invalid validation applied to the field Age",
 		},
 	}
 
@@ -403,7 +404,8 @@ func TestNestedFail(t *testing.T) {
 	}
 }
 
-/**
+/*
+*
 Empty Struct Validation
 */
 func TestEmptyStruct(t *testing.T) {

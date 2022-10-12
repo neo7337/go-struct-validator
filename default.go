@@ -11,9 +11,9 @@ func (e ErrMsg) Error() string {
 }
 
 var (
-	ErrNoNull = ErrMsg{errors.New("notnull validation failed")}
+	ErrNotNull = "notnull validation failed for field %s"
 
-	ErrInvalidValidationForField = ErrMsg{errors.New("invalid validation applied to the field")}
+	ErrInvalidValidationForField = "invalid validation applied to the field %s"
 
 	ErrMin = ErrMsg{errors.New("min value validation failed")}
 
