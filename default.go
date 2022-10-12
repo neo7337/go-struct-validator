@@ -25,9 +25,9 @@ var (
 
 	ErrMultipleOf = "multipleOf validation failed for field %s"
 
-	ErrMinLength = ErrMsg{errors.New("min-length validation failed")}
+	ErrMinLength = "min-length validation failed for field %s"
 
-	ErrMaxLength = ErrMsg{errors.New("max-length validation failed")}
+	ErrMaxLength = "max-length validation failed for field %s"
 
 	ErrPattern = ErrMsg{errors.New("pattern validation failed")}
 
