@@ -17,11 +17,11 @@ var (
 
 	ErrMin = "min value validation failed for field %s"
 
-	ErrMax = ErrMsg{errors.New("max value validation failed")}
+	ErrMax = "max value validation failed for field %s"
 
 	ErrExclusiveMin = "exclusive min validation failed for field %s"
 
-	ErrExclusiveMax = ErrMsg{errors.New("exclusive max validation failed")}
+	ErrExclusiveMax = "exclusive max validation failed for field %s"
 
 	ErrMultipleOf = ErrMsg{errors.New("multipleOf validation failed")}
 

@@ -367,9 +367,9 @@ func checkMax(field field, param string, isExclusive bool) error {
 	}
 	if !valid {
 		if isExclusive {
-			return ErrExclusiveMax
+			return fmt.Errorf(ErrExclusiveMax, field.name)
 		} else {
-			return ErrMax
+			return fmt.Errorf(ErrMax, field.name)
 		}
 	}
 	return nil
