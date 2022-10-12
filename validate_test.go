@@ -118,7 +118,7 @@ func TestNumericValidations(t *testing.T) {
 				MinC3 int `json:"minC3" constraints:"min=10"`
 				MaxC3 int `json:"maxC3" constraints:"max=49"`
 			}{MinC3: 12, MaxC3: 55},
-			want: "max value validation failed",
+			want: "max value validation failed for field MaxC3",
 		},
 		/**
 		exclusive min/max validation test
@@ -137,7 +137,7 @@ func TestNumericValidations(t *testing.T) {
 				MinC6 int `json:"minC6" constraints:"exclusiveMin=10"`
 				MaxC6 int `json:"maxC6" constraints:"exclusiveMax=50"`
 			}{MinC6: 10, MaxC6: 51},
-			want: "exclusive max validation failed",
+			want: "exclusive max validation failed for field MaxC6",
 		},
 		{
 			Name: "Test-fail-5",
