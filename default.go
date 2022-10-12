@@ -2,14 +2,6 @@ package validator
 
 import "errors"
 
-type ErrMsg struct {
-	Err error
-}
-
-func (e ErrMsg) Error() string {
-	return e.Err.Error()
-}
-
 var (
 	ErrNotNull = "notnull validation failed for field %s"
 
