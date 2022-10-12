@@ -266,7 +266,7 @@ func TestStringValidation(t *testing.T) {
 			input: struct {
 				Str5 string `json:"str5" constraints:"pattern=^[tes]{4}.*"`
 			}{Str5: "abcd1234"},
-			want: "pattern validation failed",
+			want: "pattern validation failed for field Str5",
 		},
 		{
 			Name: "Test-fail-4",
@@ -280,7 +280,7 @@ func TestStringValidation(t *testing.T) {
 			input: struct {
 				Str string `json:"str" constraints:"pattern=gray|grey"`
 			}{Str: "gry"},
-			want: "pattern validation failed",
+			want: "pattern validation failed for field Str",
 		},
 		{
 			Name: "Test-fail-6",

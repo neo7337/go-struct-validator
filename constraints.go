@@ -109,7 +109,7 @@ func pattern(field field, param string) error {
 			return ErrBadConstraint
 		}
 		if !re.MatchString(in) {
-			return ErrPattern
+			return fmt.Errorf(ErrPattern, field.name)
 		}
 	default:
 		return fmt.Errorf(ErrInvalidValidationForField, field.name)
