@@ -129,7 +129,7 @@ func enum(field field, param string) error {
 	}
 
 	if flag == false {
-		return ErrEnums
+		return fmt.Errorf(ErrEnums, field.name)
 	}
 	return nil
 }

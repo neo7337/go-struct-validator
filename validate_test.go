@@ -467,7 +467,7 @@ func TestEnumValidation(t *testing.T) {
 				Status2     string `json:"status2" constraints:"enum=Success,Error,Not Reachable"`
 				StatusCode2 int    `json:"statusCode2" constraints:"enum=200,404,500"`
 			}{Status2: "Success", StatusCode2: 503},
-			want: "enum validation failed",
+			want: "enum validation failed for field StatusCode2",
 		},
 	}
 

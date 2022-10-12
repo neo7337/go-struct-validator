@@ -35,5 +35,5 @@ var (
 
 	ErrNotSupported = ErrMsg{errors.New("unsupported constraint on type")}
 
-	ErrEnums = ErrMsg{errors.New("enum validation failed")}
+	ErrEnums = "enum validation failed for field %s"
 )
