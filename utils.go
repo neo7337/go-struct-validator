@@ -14,7 +14,7 @@ constraints conversion from string
 func convertInt(param string, bit int) (int64, error) {
 	i, err := strconv.ParseInt(param, 0, bit)
 	if err != nil {
-		return 0, ErrBadConstraint
+		return 0, ErrConversionFailed
 	}
 	return i, nil
 }
@@ -22,7 +22,7 @@ func convertInt(param string, bit int) (int64, error) {
 func convertUint(param string, bit int) (uint64, error) {
 	i, err := strconv.ParseUint(param, 0, bit)
 	if err != nil {
-		return 0, ErrBadConstraint
+		return 0, ErrConversionFailed
 	}
 	return i, nil
 }
@@ -30,7 +30,7 @@ func convertUint(param string, bit int) (uint64, error) {
 func convertFloat(param string, bit int) (float64, error) {
 	i, err := strconv.ParseFloat(param, bit)
 	if err != nil {
-		return 0, ErrBadConstraint
+		return 0, ErrConversionFailed
 	}
 	return i, nil
 }
@@ -38,7 +38,7 @@ func convertFloat(param string, bit int) (float64, error) {
 func convertBool(param string) (bool, error) {
 	i, err := strconv.ParseBool(param)
 	if err != nil {
-		return false, ErrBadConstraint
+		return false, ErrConversionFailed
 	}
 	return i, nil
 }
@@ -50,7 +50,7 @@ func checkMin(field field, param string, isExclusive bool) error {
 	case reflect.Int:
 		c, err := convertInt(param, 0)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMin", param, field.name)
 		}
 		cInt := int(c)
 		in, _ := val.Interface().(int)
@@ -62,7 +62,7 @@ func checkMin(field field, param string, isExclusive bool) error {
 	case reflect.Int8:
 		c, err := convertInt(param, 8)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMin", param, field.name)
 		}
 		cInt := int8(c)
 		in, _ := val.Interface().(int8)
@@ -74,7 +74,7 @@ func checkMin(field field, param string, isExclusive bool) error {
 	case reflect.Int16:
 		c, err := convertInt(param, 16)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMin", param, field.name)
 		}
 		cInt := int16(c)
 		in, _ := val.Interface().(int16)
@@ -86,7 +86,7 @@ func checkMin(field field, param string, isExclusive bool) error {
 	case reflect.Int32:
 		c, err := convertInt(param, 32)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMin", param, field.name)
 		}
 		cInt := int32(c)
 		in, _ := val.Interface().(int32)
@@ -98,7 +98,7 @@ func checkMin(field field, param string, isExclusive bool) error {
 	case reflect.Int64:
 		c, err := convertInt(param, 64)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMin", param, field.name)
 		}
 		in, _ := val.Interface().(int64)
 		if isExclusive {
@@ -109,7 +109,7 @@ func checkMin(field field, param string, isExclusive bool) error {
 	case reflect.Uint:
 		c, err := convertUint(param, 0)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMin", param, field.name)
 		}
 		cUint := uint(c)
 		in, _ := val.Interface().(uint)
@@ -121,7 +121,7 @@ func checkMin(field field, param string, isExclusive bool) error {
 	case reflect.Uint8:
 		c, err := convertUint(param, 8)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMin", param, field.name)
 		}
 		cUint := uint8(c)
 		in, _ := val.Interface().(uint8)
@@ -133,7 +133,7 @@ func checkMin(field field, param string, isExclusive bool) error {
 	case reflect.Uint16:
 		c, err := convertUint(param, 16)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMin", param, field.name)
 		}
 		cUint := uint16(c)
 		in, _ := val.Interface().(uint16)
@@ -145,7 +145,7 @@ func checkMin(field field, param string, isExclusive bool) error {
 	case reflect.Uint32:
 		c, err := convertUint(param, 32)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMin", param, field.name)
 		}
 		cUint := uint32(c)
 		in, _ := val.Interface().(uint32)
@@ -157,7 +157,7 @@ func checkMin(field field, param string, isExclusive bool) error {
 	case reflect.Uint64:
 		c, err := convertUint(param, 64)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMin", param, field.name)
 		}
 		in, _ := val.Interface().(uint64)
 		if isExclusive {
@@ -175,7 +175,7 @@ func checkMin(field field, param string, isExclusive bool) error {
 	case reflect.Float32:
 		c, err := convertFloat(param, 32)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMax", param, field.name)
 		}
 		cFloat := float32(c)
 		in, _ := val.Interface().(float32)
@@ -187,7 +187,7 @@ func checkMin(field field, param string, isExclusive bool) error {
 	case reflect.Float64:
 		c, err := convertFloat(param, 64)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMax", param, field.name)
 		}
 		cFloat := c
 		in, _ := val.Interface().(float64)
@@ -216,7 +216,7 @@ func checkMax(field field, param string, isExclusive bool) error {
 	case reflect.Int:
 		c, err := convertInt(param, 0)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMax", param, field.name)
 		}
 		cInt := int(c)
 		in, _ := val.Interface().(int)
@@ -228,7 +228,7 @@ func checkMax(field field, param string, isExclusive bool) error {
 	case reflect.Int8:
 		c, err := convertInt(param, 8)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMax", param, field.name)
 		}
 		cInt := int8(c)
 		in, _ := val.Interface().(int8)
@@ -240,7 +240,7 @@ func checkMax(field field, param string, isExclusive bool) error {
 	case reflect.Int16:
 		c, err := convertInt(param, 16)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMax", param, field.name)
 		}
 		cInt := int16(c)
 		in, _ := val.Interface().(int16)
@@ -252,7 +252,7 @@ func checkMax(field field, param string, isExclusive bool) error {
 	case reflect.Int32:
 		c, err := convertInt(param, 32)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMax", param, field.name)
 		}
 		cInt := int32(c)
 		in, _ := val.Interface().(int32)
@@ -264,7 +264,7 @@ func checkMax(field field, param string, isExclusive bool) error {
 	case reflect.Int64:
 		c, err := convertInt(param, 64)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMax", param, field.name)
 		}
 		in, _ := val.Interface().(int64)
 		if isExclusive {
@@ -275,7 +275,7 @@ func checkMax(field field, param string, isExclusive bool) error {
 	case reflect.Uint:
 		c, err := convertUint(param, 0)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMax", param, field.name)
 		}
 		cUint := uint(c)
 		in, _ := val.Interface().(uint)
@@ -287,7 +287,7 @@ func checkMax(field field, param string, isExclusive bool) error {
 	case reflect.Uint8:
 		c, err := convertUint(param, 8)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMax", param, field.name)
 		}
 		cUint := uint8(c)
 		in, _ := val.Interface().(uint8)
@@ -299,7 +299,7 @@ func checkMax(field field, param string, isExclusive bool) error {
 	case reflect.Uint16:
 		c, err := convertUint(param, 16)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMax", param, field.name)
 		}
 		cUint := uint16(c)
 		in, _ := val.Interface().(uint16)
@@ -311,7 +311,7 @@ func checkMax(field field, param string, isExclusive bool) error {
 	case reflect.Uint32:
 		c, err := convertUint(param, 32)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMax", param, field.name)
 		}
 		cUint := uint32(c)
 		in, _ := val.Interface().(uint32)
@@ -323,7 +323,7 @@ func checkMax(field field, param string, isExclusive bool) error {
 	case reflect.Uint64:
 		c, err := convertUint(param, 64)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMax", param, field.name)
 		}
 		in, _ := val.Interface().(uint64)
 		if isExclusive {
@@ -341,7 +341,7 @@ func checkMax(field field, param string, isExclusive bool) error {
 	case reflect.Float32:
 		c, err := convertFloat(param, 32)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMax", param, field.name)
 		}
 		cFloat := float32(c)
 		in, _ := val.Interface().(float32)
@@ -353,7 +353,7 @@ func checkMax(field field, param string, isExclusive bool) error {
 	case reflect.Float64:
 		c, err := convertFloat(param, 64)
 		if err != nil {
-			return err
+			return fmt.Errorf(ErrBadConstraint, "checkMax", param, field.name)
 		}
 		cFloat := c
 		in, _ := val.Interface().(float64)

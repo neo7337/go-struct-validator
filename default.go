@@ -13,8 +13,6 @@ func (e ErrMsg) Error() string {
 var (
 	ErrNotNull = "notnull validation failed for field %s"
 
-	ErrInvalidValidationForField = "invalid validation applied to the field %s"
-
 	ErrMin = "min value validation failed for field %s"
 
 	ErrMax = "max value validation failed for field %s"
@@ -31,9 +29,13 @@ var (
 
 	ErrPattern = "pattern validation failed for field %s"
 
-	ErrBadConstraint = ErrMsg{errors.New("invalid constraint value")}
-
-	ErrNotSupported = ErrMsg{errors.New("unsupported constraint on type")}
-
 	ErrEnums = "enum validation failed for field %s"
+
+	ErrBadConstraint = "invalid constraint %s with value '%s' for field %s"
+
+	ErrInvalidValidationForField = "invalid validation applied to the field %s"
+
+	ErrNotSupported = errors.New("unsupported constraint on type")
+
+	ErrConversionFailed = errors.New("conversion failed")
 )

@@ -273,7 +273,7 @@ func TestStringValidation(t *testing.T) {
 			input: struct {
 				Str6 string `json:"str6" constraints:"pattern=["`
 			}{Str6: "tsst1234"},
-			want: "invalid constraint value",
+			want: "invalid constraint pattern with value '[' for field Str6",
 		},
 		{
 			Name: "Test-fail-5",
@@ -294,7 +294,7 @@ func TestStringValidation(t *testing.T) {
 			input: struct {
 				Name string `json:"name" constraints:"notnull=dummy"`
 			}{Name: ""},
-			want: "invalid constraint value",
+			want: "invalid constraint notnull with value 'dummy' for field Name",
 		},
 		{
 			Name: "Test-fail-8",
