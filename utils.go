@@ -201,9 +201,9 @@ func checkMin(field field, param string, isExclusive bool) error {
 	}
 	if !valid {
 		if isExclusive {
-			return ErrExclusiveMin
+			return fmt.Errorf(ErrExclusiveMin, field.name)
 		} else {
-			return ErrMin
+			return fmt.Errorf(ErrMin, field.name)
 		}
 	}
 	return nil

@@ -15,11 +15,11 @@ var (
 
 	ErrInvalidValidationForField = "invalid validation applied to the field %s"
 
-	ErrMin = ErrMsg{errors.New("min value validation failed")}
+	ErrMin = "min value validation failed for field %s"
 
 	ErrMax = ErrMsg{errors.New("max value validation failed")}
 
-	ErrExclusiveMin = ErrMsg{errors.New("exclusive min validation failed")}
+	ErrExclusiveMin = "exclusive min validation failed for field %s"
 
 	ErrExclusiveMax = ErrMsg{errors.New("exclusive max validation failed")}
 
