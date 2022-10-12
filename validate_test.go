@@ -248,7 +248,7 @@ func TestStringValidation(t *testing.T) {
 				Str1T2 string `json:"str1T2" constraints:"min-length=10"`
 				Str2T2 string `json:"str2T2" constraints:"max-length=15"`
 			}{Str1T2: "hell_worl", Str2T2: "hello_world_go"},
-			want: "min-length validation failed",
+			want: "min-length validation failed for field Str1T2",
 		},
 		{
 			Name: "Test-fail-2",
@@ -256,7 +256,7 @@ func TestStringValidation(t *testing.T) {
 				Str1T3 string `json:"str1T3" constraints:"min-length=10"`
 				Str2T3 string `json:"str2T3" constraints:"max-length=15"`
 			}{Str1T3: "hello_world", Str2T3: "hello_world_from_go"},
-			want: "max-length validation failed",
+			want: "max-length validation failed for field Str2T3",
 		},
 		/**
 		pattern validations
@@ -398,7 +398,7 @@ func TestNestedFail(t *testing.T) {
 
 	err := sv.Validate(msg)
 	got := err.Error()
-	want := "min-length validation failed"
+	want := "min-length validation failed for field Ref"
 	if got != want {
 		t.Errorf("Expected: %s, got: %s", got, want)
 	}

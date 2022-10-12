@@ -77,7 +77,7 @@ func minLength(field field, param string) error {
 		lv := len(fmt.Sprint(field.value))
 		valid := lv > lc
 		if !valid {
-			return ErrMinLength
+			return fmt.Errorf(ErrMinLength, field.name)
 		}
 	default:
 		return fmt.Errorf(ErrInvalidValidationForField, field.name)
@@ -92,7 +92,7 @@ func maxLength(field field, param string) error {
 		lv := len(fmt.Sprint(field.value))
 		valid := lv < lc
 		if !valid {
-			return ErrMaxLength
+			return fmt.Errorf(ErrMaxLength, field.name)
 		}
 	default:
 		return fmt.Errorf(ErrInvalidValidationForField, field.name)
