@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -42,9 +43,10 @@ func convertBool(param string) (bool, error) {
 	return i, nil
 }
 
-func checkMin(val reflect.Value, typ reflect.Type, param string, isExclusive bool) error {
+func checkMin(field field, param string, isExclusive bool) error {
+	val := field.value
 	valid := true
-	switch typ.Kind() {
+	switch field.typ.Kind() {
 	case reflect.Int:
 		c, err := convertInt(param, 0)
 		if err != nil {
@@ -195,7 +197,7 @@ func checkMin(val reflect.Value, typ reflect.Type, param string, isExclusive boo
 			valid = in > cFloat
 		}
 	default:
-		return ErrInvalidValidationForField
+		return fmt.Errorf(ErrInvalidValidationForField, field.name)
 	}
 	if !valid {
 		if isExclusive {
@@ -207,9 +209,10 @@ func checkMin(val reflect.Value, typ reflect.Type, param string, isExclusive boo
 	return nil
 }
 
-func checkMax(val reflect.Value, typ reflect.Type, param string, isExclusive bool) error {
+func checkMax(field field, param string, isExclusive bool) error {
 	valid := true
-	switch typ.Kind() {
+	val := field.value
+	switch field.typ.Kind() {
 	case reflect.Int:
 		c, err := convertInt(param, 0)
 		if err != nil {
@@ -360,7 +363,7 @@ func checkMax(val reflect.Value, typ reflect.Type, param string, isExclusive boo
 			valid = in < cFloat
 		}
 	default:
-		return ErrInvalidValidationForField
+		return fmt.Errorf(ErrInvalidValidationForField, field.name)
 	}
 	if !valid {
 		if isExclusive {
