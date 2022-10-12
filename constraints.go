@@ -39,7 +39,7 @@ func multipleOf(field field, param string) error {
 		}
 		valid := in%cInt == 0
 		if !valid {
-			return ErrMultipleOf
+			return fmt.Errorf(ErrMultipleOf, field.name)
 		}
 	default:
 		return fmt.Errorf(ErrInvalidValidationForField, field.name)

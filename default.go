@@ -23,7 +23,7 @@ var (
 
 	ErrExclusiveMax = "exclusive max validation failed for field %s"
 
-	ErrMultipleOf = ErrMsg{errors.New("multipleOf validation failed")}
+	ErrMultipleOf = "multipleOf validation failed for field %s"
 
 	ErrMinLength = ErrMsg{errors.New("min-length validation failed")}
 
