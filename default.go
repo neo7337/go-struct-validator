@@ -29,7 +29,7 @@ var (
 
 	ErrMaxLength = "max-length validation failed for field %s"
 
-	ErrPattern = ErrMsg{errors.New("pattern validation failed")}
+	ErrPattern = "pattern validation failed for field %s"
 
 	ErrBadConstraint = ErrMsg{errors.New("invalid constraint value")}
 
