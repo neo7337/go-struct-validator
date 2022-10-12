@@ -110,7 +110,7 @@ func TestNumericValidations(t *testing.T) {
 				MinC2 int `json:"minC2" constraints:"min=10"`
 				MaxC2 int `json:"maxC2" constraints:"max=49"`
 			}{MinC2: 7, MaxC2: 45},
-			want: "min value validation failed",
+			want: "min value validation failed for field MinC2",
 		},
 		{
 			Name: "Test-fail-2",
@@ -129,7 +129,7 @@ func TestNumericValidations(t *testing.T) {
 				MinC5 int `json:"minC5" constraints:"exclusiveMin=10"`
 				MaxC5 int `json:"maxC5" constraints:"exclusiveMax=50"`
 			}{MinC5: 9, MaxC5: 50},
-			want: "exclusive min validation failed",
+			want: "exclusive min validation failed for field MinC5",
 		},
 		{
 			Name: "Test-fail-4",
@@ -541,7 +541,7 @@ func TestCacheErrs(t *testing.T) {
 				Age    int    `json:"age" constraints:"min=10"`
 				Mobile int    `json:"mobile" constraints:""`
 			}{Name: "Testings", Age: 5, Mobile: 123456789},
-			want: "min value validation failed",
+			want: "min value validation failed for field Age",
 		},
 	}
 
