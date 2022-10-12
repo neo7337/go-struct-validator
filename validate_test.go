@@ -144,7 +144,7 @@ func TestNumericValidations(t *testing.T) {
 			input: struct {
 				Num8 int `json:"num8" constraints:"multipleOf=5"`
 			}{Num8: 11},
-			want: "multipleOf validation failed",
+			want: "multipleOf validation failed for field Num8",
 		},
 		{
 			Name: "Test-fail-6",
