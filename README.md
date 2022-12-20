@@ -38,10 +38,9 @@ go test -run=Bench -bench=. -benchtime 5000000x
 
 It comes with a simple usage as explained below, just import the package, and you are good to go.
 
-To add check for validations, add the `constraints` tag in the struct fields or configure a one of your desire using 
+To add check for validations, add the `constraints` tag in the struct fields or configure a one of your desire using
 
 ```go
-
 package main
 
 import (
