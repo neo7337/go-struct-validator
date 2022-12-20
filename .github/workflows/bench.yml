@@ -1,11 +1,8 @@
-name: Build & Test
+name: Benchmark
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches:
-      - "*"
 
 jobs:
   build:
@@ -23,8 +20,5 @@ jobs:
       - name: Build
         run: make build
 
-      - name: Test
-        run: make test
-
-      - name: Test Coverage
-        run: make test-cover
+      - name: Benchmark
+        run: make test-bench
