@@ -482,8 +482,8 @@ func TestEnumValidation(t *testing.T) {
 }
 
 func TestCacheSuccess(t *testing.T) {
-	withCache := validator.NewStructValidatorWithCache()
-
+	vd := validator.NewStructValidator()
+	vd.SetCache(true)
 	// same structs with different fields will give the cached results on cached enabled
 	testsWithCache := []struct {
 		Name  string
@@ -508,7 +508,7 @@ func TestCacheSuccess(t *testing.T) {
 	}
 	for _, tt := range testsWithCache {
 		t.Run(tt.Name, func(t *testing.T) {
-			err := withCache.Validate(tt.input)
+			err := vd.Validate(tt.input)
 			if err != nil {
 				t.Errorf("Error in validation: %s", err)
 			}
@@ -552,6 +552,41 @@ func TestCacheErrs(t *testing.T) {
 				if tt.want != err.Error() {
 					t.Errorf("Got: %s, want: %s", err, tt.want)
 				}
+			}
+		})
+	}
+}
+
+func TestStructValidator_SetTagName(t *testing.T) {
+	vd := validator.NewStructValidator()
+	vd.SetTagName("customTag")
+
+	testsWithCache := []struct {
+		Name  string
+		input interface{}
+	}{
+		{
+			Name: "Test-pass-1",
+			input: struct {
+				Name   string `json:"name" customTag:"min-length=5"`
+				Age    int    `json:"age" customTag:"min=10"`
+				Mobile int    `json:"mobile" customTag:""`
+			}{Name: "Testings", Age: 20, Mobile: 123456789},
+		},
+		{
+			Name: "Test-pass-2",
+			input: struct {
+				Name   string `json:"name" customTag:"min-length=5"`
+				Age    int    `json:"age" customTag:"min=10"`
+				Mobile int    `json:"mobile" customTag:""`
+			}{Name: "Testings", Age: 21, Mobile: 123456789},
+		},
+	}
+	for _, tt := range testsWithCache {
+		t.Run(tt.Name, func(t *testing.T) {
+			err := vd.Validate(tt.input)
+			if err != nil {
+				t.Errorf("Error in validation: %s", err)
 			}
 		})
 	}
