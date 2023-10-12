@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
@@ -26,20 +27,27 @@ func (sv *StructValidator) validateFields() error {
 // parseTag returns the map of constraints
 func (sv *StructValidator) parseTag(tag string) ([]tStruct, error) {
 	tl := splitUnescapedComma(tag)
-	t := make([]tStruct, 0, len(tl))
+	t := make([]tStruct, len(tl))
 
-	for _, s := range tl {
+	for i, s := range tl {
 		s = strings.Replace(s, `\,`, ",", -1)
-		tg := tStruct{}
 		v := strings.SplitN(s, "=", 2)
-		tg.name = strings.Trim(v[0], " ")
-		//check for blank tag name
+		name := strings.Trim(v[0], " ")
+
+		// Check for blank tag name
 		if len(v) > 1 {
-			tg.value = strings.Trim(v[1], " ")
+			value := strings.Trim(v[1], " ")
+
+			// Lookup validation function and populate tStruct
+			if fnc, found := sv.validationFunc[name]; found {
+				t[i] = tStruct{name, value, fnc}
+			} else {
+				return nil, fmt.Errorf("validation function not found for tag: %s", name)
+			}
+		} else {
+			// No value provided, simply set the name
+			t[i] = tStruct{name: name}
 		}
-		tg.fnc, _ = sv.validationFunc[tg.name]
-		// check for not found
-		t = append(t, tg)
 	}
 
 	return t, nil
@@ -48,7 +56,7 @@ func (sv *StructValidator) parseTag(tag string) ([]tStruct, error) {
 var sepPattern = regexp.MustCompile(`((?:^|[^\\])(?:\\\\)*);`)
 
 func splitUnescapedComma(str string) []string {
-	ret := []string{}
+	var ret []string
 	indexes := sepPattern.FindAllStringIndex(str, -1)
 	last := 0
 	for _, is := range indexes {
@@ -65,7 +73,7 @@ func (sv *StructValidator) parseFields(v interface{}) structFields {
 	t := reflect.ValueOf(v).Type()
 	fv := reflect.ValueOf(v)
 
-	current := []field{}
+	var current []field
 	next := []field{{typ: t}}
 
 	var count, nextCount map[reflect.Type]int
