@@ -1,8 +1,9 @@
 package validator
 
 import (
-	"go.nandlabs.io/l3"
 	"reflect"
+
+	"go.nandlabs.io/l3"
 )
 
 var logger = l3.Get()
@@ -64,7 +65,6 @@ func NewStructValidator() *StructValidator {
 }
 
 // SetTagName : provide the custom tag-name for your constraints
-//
 // By default : 'constraints' tag-name is used
 func (sv *StructValidator) SetTagName(tag string) *StructValidator {
 	sv.tagName = tag
