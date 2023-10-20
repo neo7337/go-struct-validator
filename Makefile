@@ -16,7 +16,7 @@ test-cover:
 
 .PHONY: test-bench
 test-bench:
-	@go test -run=Bench -bench=. -benchtime 5000000x
+	@go test -run=Bench -bench=. -benchtime 5000000x -run=^#
 
 .PHONY: build
 build:

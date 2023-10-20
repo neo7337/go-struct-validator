@@ -14,6 +14,7 @@ The validator covers the specifications, and its respective validations accordin
 - [Quick Start Guide](#quick-start-guide)
 - [Features](#features)
     - [Validations Supported](#validations-supported)
+- [Contributing](#contributing)
 
 ---
 
@@ -89,3 +90,7 @@ func main() {
 | 11    |   pattern    | string              | ✅      |
 | 11    |   notnull    | string              | ✅      |
 | 12    |     enum     | all                 | ✅      |
+
+### Contributing
+We welcome contributions to the project. If you find a bug or would like to request a new feature, please open an issue 
+on [GitHub](https://github.com/neo7337/go-struct-validator/issues).

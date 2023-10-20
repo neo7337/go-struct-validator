@@ -58,7 +58,7 @@ func notnull(field field, param string) error {
 		if err != nil {
 			return fmt.Errorf(ErrBadConstraint, "notnull", param, field.name)
 		}
-		if c == true {
+		if c {
 			in, _ := field.value.Interface().(string)
 			if in == "" {
 				return fmt.Errorf(ErrNotNull, field.name)
@@ -128,7 +128,7 @@ func enum(field field, param string) error {
 		flag = checkIfEnumExists(input, param, ",")
 	}
 
-	if flag == false {
+	if !flag {
 		return fmt.Errorf(ErrEnums, field.name)
 	}
 	return nil
