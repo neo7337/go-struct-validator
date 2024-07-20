@@ -3,7 +3,7 @@ package validator
 import (
 	"reflect"
 
-	"go.nandlabs.io/l3"
+	"oss.nandlabs.io/golly/l3"
 )
 
 var logger = l3.Get()
