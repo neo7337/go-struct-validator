@@ -1,5 +1,7 @@
 # go-struct-validator
 
+![](/public/images/banner.gif)
+
 ![Build Status](https://github.com/neo7337/go-struct-validator/actions/workflows/ci.yml/badge.svg)
 
 Neo's Go Struct Validator is a simple validator built on the core of OAS Specification. The validator is heavily
