@@ -1,7 +1,7 @@
 module github.com/neo7337/go-struct-validator
 
-go 1.19
+go 1.22.1
 
-require go.nandlabs.io/l3 v0.0.1
+toolchain go1.22.4
 
-require go.nandlabs.io/commons v0.0.1 // indirect
+require oss.nandlabs.io/golly v1.0.0
